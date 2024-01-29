@@ -1,0 +1,169 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Contact {
+  id           Int        @id @default(autoincrement())
+  firstName    String
+  lastName     String
+  phone1       String
+  phone2       String?
+  email1       String?
+  email2       String?
+  address      String?
+  coordinates  String?
+  directions   String?
+  asContractor Boolean?
+  createdAt    DateTime   @default(now())
+  updatedAt    DateTime
+  Delivery     Delivery[]
+}
+
+model Delivery {
+  id              Int      @id @default(autoincrement())
+  deliveryDate    DateTime
+  contactId       Int
+  deliveryPhone   String?
+  deliveryAddress String
+  coordinates     String?
+  directions      String?
+  productName     String?
+  productQuantity String?
+  notes           String?
+  completed       Boolean?
+  isPaid          Boolean?
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime
+  Contact         Contact  @relation(fields: [contactId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+}
+
+model Driver {
+  id             Int       @id @default(autoincrement())
+  firstName      String
+  lastName       String
+  defaultTruck   String?
+  endDumpPayRate Float
+  flatBedPayRate Float
+  ncPayRate      Float
+  dateHired      DateTime?
+  dateReleased   DateTime?
+  isActive       Boolean?
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime
+  Haul           Haul[]
+  Workday        Workday[]
+}
+
+model FreightRoute {
+  id               Int            @id @default(autoincrement())
+  freightCost      Float
+  notes            String?
+  vendorId         Int
+  vendorLocationId Int
+  isActive         Boolean?
+  createdAt        DateTime       @default(now())
+  updatedAt        DateTime
+  Vendor           Vendor         @relation(fields: [vendorId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  VendorLocation   VendorLocation @relation(fields: [vendorLocationId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  Haul             Haul[]
+}
+
+model Haul {
+  id               Int            @id @default(autoincrement())
+  dateHaul         DateTime
+  driverId         Int
+  truck            String
+  customer         String?
+  invoice          String?
+  chInvoice        String?
+  vendorLocationId Int
+  freightRouteId   Int
+  product          String?
+  tons             Float?
+  rate             Float?
+  loadType         LoadType       @default(ENDDUMP)
+  miles            Float?
+  payRate          Float?
+  driverPay        Float?
+  createdAt        DateTime       @default(now())
+  updatedAt        DateTime
+  Driver           Driver         @relation(fields: [driverId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  FreightRoute     FreightRoute   @relation(fields: [freightRouteId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  VendorLocation   VendorLocation @relation(fields: [vendorLocationId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+}
+
+model User {
+  id        Int      @id @default(autoincrement())
+  firstName String
+  lastName  String
+  email     String   @unique
+  phone     String
+  role      Role     @default(USER)
+  createdAt DateTime @default(now())
+  updatedAt DateTime
+}
+
+model Vendor {
+  id                  Int              @id @default(autoincrement())
+  name                String
+  shortName           String
+  chtFuelSurcharge    Float
+  vendorFuelSurcharge Float
+  isActive            Boolean?
+  createdAt           DateTime         @default(now())
+  updatedAt           DateTime
+  FreightRoute        FreightRoute[]
+  VendorLocation      VendorLocation[]
+  VendorProduct       VendorProduct[]
+}
+
+model VendorLocation {
+  id            Int             @id @default(autoincrement())
+  name          String
+  vendorId      Int
+  isActive      Boolean?
+  createdAt     DateTime        @default(now())
+  updatedAt     DateTime
+  FreightRoute  FreightRoute[]
+  Haul          Haul[]
+  Vendor        Vendor          @relation(fields: [vendorId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  VendorProduct VendorProduct[]
+}
+
+model VendorProduct {
+  id               Int            @id @default(autoincrement())
+  vendorId         Int
+  vendorLocationId Int
+  name             String
+  productCost      Float
+  notes            String?
+  isActive         Boolean?
+  createdAt        DateTime       @default(now())
+  updatedAt        DateTime
+  Vendor           Vendor         @relation(fields: [vendorId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  VendorLocation   VendorLocation @relation(fields: [vendorLocationId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+}
+
+model Workday {
+  id        Int      @id @default(autoincrement())
+  driverId  Int
+  date      DateTime
+  createdAt DateTime @default(now())
+  updatedAt DateTime
+  Driver    Driver   @relation(fields: [driverId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+}
+
+enum LoadType {
+  ENDDUMP
+  FLATBED
+}
+
+enum Role {
+  ADMIN
+  USER
+}

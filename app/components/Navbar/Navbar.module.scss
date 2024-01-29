@@ -1,0 +1,42 @@
+$nav-bgcolor: #1e2e46;
+$logo-bgcolor: #171d22;
+$link-color: #e5e5e5;
+$hover-brightness: 7%;
+$active-brightness: 19%;
+
+.nav {
+  display: flex;
+  flex-direction: column;
+  height: 100svh;
+  background-color: $nav-bgcolor;
+}
+
+.logo {
+  background-color: $logo-bgcolor;
+  color: white;
+  text-align: center;
+  padding: 0.65em 3em;
+  font-weight: bold;
+  font-size: 1.5rem;
+}
+
+.link {
+  padding: 0.65em 1.5em;
+  color: $link-color;
+  transition: background-color 0.2s ease-in-out;
+
+  &:hover {
+    background-color: lighten($nav-bgcolor, $hover-brightness);
+    transition: background-color 0.2s ease-in-out;
+  }
+}
+
+.active {
+  background-color: lighten($nav-bgcolor, $active-brightness);
+  transition: background-color 0.2s ease-in-out;
+
+  &:hover {
+    background-color: lighten($nav-bgcolor, $active-brightness);
+    transition: background-color 0.2s ease-in-out;
+  }
+}
