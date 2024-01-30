@@ -1,0 +1,72 @@
+$driverTable-cellPadding: 0.15em;
+$driverTable-btnPadding: 0.3em 1em;
+$driverTable-btnBorderRadius: 5px;
+$driverTable-editBtnBgColor: #274370;
+$driverTable-deleteBtnBgColor: #943232;
+$driverTable-btnHoverLightenAmt: 10%;
+$driverTable-perLabel-color: #acacac;
+
+.wrapper {
+  width: 1100px;
+}
+
+.perLabel {
+  font-weight: bold;
+  color: $driverTable-perLabel-color;
+}
+
+.table {
+  width: 100%;
+  transition: background-color 0.2s;
+
+  tr:hover {
+    background-color: lighten($driverTable-editBtnBgColor, 57%);
+    transition: background-color 0.2s;
+  }
+
+  tr th {
+    border: 1px solid #000;
+    text-align: left;
+    padding: $driverTable-cellPadding;
+  }
+
+  td {
+    border: 1px solid #000;
+    text-align: left;
+    padding: $driverTable-cellPadding;
+  }
+
+  td:first-child {
+    text-align: center;
+  }
+
+  button {
+    padding: $driverTable-btnPadding;
+    border-radius: $driverTable-btnBorderRadius;
+    color: white;
+    transition: background-color 0.2s ease-in-out;
+  }
+
+  .editBtn {
+    background-color: $driverTable-editBtnBgColor;
+
+    &:hover {
+      background-color: lighten(
+        $driverTable-editBtnBgColor,
+        $driverTable-btnHoverLightenAmt
+      );
+      transition: background-color 0.2s ease-in-out;
+    }
+  }
+
+  .deleteBtn {
+    background-color: $driverTable-deleteBtnBgColor;
+
+    &:hover {
+      background-color: lighten(
+        $driverTable-deleteBtnBgColor,
+        $driverTable-btnHoverLightenAmt
+      );
+    }
+  }
+}

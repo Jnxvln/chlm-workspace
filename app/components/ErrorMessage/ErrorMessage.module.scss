@@ -1,0 +1,19 @@
+$err-padding: 0.5em;
+$err-borderRadius: 10px;
+
+.wrapper {
+  background-color: #c58787;
+  border-radius: $err-borderRadius;
+}
+
+.header {
+  background-color: #692a2a;
+  border-top-left-radius: $err-borderRadius;
+  border-top-right-radius: $err-borderRadius;
+  color: white;
+  padding: $err-padding;
+}
+
+.message {
+  padding: $err-padding;
+}
