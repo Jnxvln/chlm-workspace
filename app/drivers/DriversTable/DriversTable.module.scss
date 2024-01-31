@@ -70,3 +70,13 @@ $driverTable-perLabel-color: #acacac;
     }
   }
 }
+
+.editDriverTable {
+  tbody tr td {
+    padding: 0.25em;
+  }
+
+  input {
+    padding: 0.2em;
+  }
+}

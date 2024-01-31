@@ -1,16 +1,31 @@
 "use client";
-import { useState, useEffect } from "react";
+import { useState, useEffect, ReactElement } from "react";
 import styles from "./Dialog.module.scss";
 
 type TDialog = {
   title?: String;
-  content?: String;
+  content?: String | ReactElement<any, any> | JSX.Element | undefined | null;
   footer?: "ok" | "cancel" | "yes-no" | "yes-no-ok" | "yes-no-cancel";
   callbacks?: [Function] | undefined | null;
+  show?: Boolean;
 };
 
-export default function Dialog({ title, content, footer }: TDialog) {
-  const [visible, setVisible] = useState(true);
+export default function Dialog({
+  title,
+  content,
+  footer,
+  show,
+  callbacks,
+}: TDialog) {
+  const [visible, setVisible] = useState(false);
+
+  useEffect(() => {
+    if (show) {
+      setVisible(true);
+    } else {
+      setVisible(false);
+    }
+  }, [show]);
 
   const renderFooter = () => {
     switch (footer) {
@@ -20,7 +35,12 @@ export default function Dialog({ title, content, footer }: TDialog) {
             <button
               type="button"
               className={`${styles.button} ${styles.btn_ok}`}
-              onClick={() => setVisible(false)}
+              onClick={(e) => {
+                setVisible(false);
+                if (callbacks && callbacks.length > 0) {
+                  callbacks[0]();
+                }
+              }}
             >
               Ok
             </button>
@@ -32,6 +52,7 @@ export default function Dialog({ title, content, footer }: TDialog) {
             <button
               type="button"
               className={`${styles.button} ${styles.btn_cancel}`}
+              onClick={() => setVisible(false)}
             >
               Cancel
             </button>
@@ -43,6 +64,12 @@ export default function Dialog({ title, content, footer }: TDialog) {
             <button
               type="button"
               className={`${styles.button} ${styles.btn_default}`}
+              onClick={(e) => {
+                setVisible(false);
+                if (callbacks && callbacks.length > 0) {
+                  callbacks[0]();
+                }
+              }}
             >
               Uh oh!
             </button>
