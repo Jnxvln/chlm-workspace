@@ -4,6 +4,9 @@ $dialog-footer-bgcolor: #bdbdbd;
 $dialog-button-bgcolor: #343434;
 $dialog-padding: 0.5em;
 $dialog-borderRadius: 10px;
+$dialog-btn-default-bgcolor: #d11489;
+$dialog-btn-cancel-bgcolor: #222222;
+$dialog-btn-save-bgcolor: #1d5033;
 
 .frame {
   position: fixed;
@@ -65,5 +68,29 @@ $dialog-borderRadius: 10px;
   &:hover {
     background-color: darken($dialog-button-bgcolor, 7%);
     transition: background-color 0.2s ease-in-out;
+  }
+}
+
+.btn_default {
+  background-color: $dialog-btn-default-bgcolor;
+
+  &:hover {
+    background-color: darken($dialog-btn-default-bgcolor, 8%);
+  }
+}
+
+.btn_cancel {
+  background-color: $dialog-btn-cancel-bgcolor;
+
+  &:hover {
+    background-color: darken($dialog-btn-cancel-bgcolor, 8%);
+  }
+}
+
+.btn_save {
+  background-color: $dialog-btn-save-bgcolor;
+
+  &:hover {
+    background-color: lighten($dialog-btn-save-bgcolor, 8%);
   }
 }

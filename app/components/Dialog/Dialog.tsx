@@ -2,11 +2,26 @@
 import { useState, useEffect, ReactElement } from "react";
 import styles from "./Dialog.module.scss";
 
-type TDialog = {
+export type TDialog = {
   title?: String;
   content?: String | ReactElement<any, any> | JSX.Element | undefined | null;
-  footer?: "ok" | "cancel" | "yes-no" | "yes-no-ok" | "yes-no-cancel";
-  callbacks?: [Function] | undefined | null;
+  footer?:
+    | "ok"
+    | "cancel"
+    | "yes-no"
+    | "yes-no-ok"
+    | "yes-no-cancel"
+    | "save"
+    | "save-cancel"
+    | "default";
+  callbacks: {
+    ok?: Function | undefined | null;
+    cancel?: Function | undefined | null;
+    yes?: Function | undefined | null;
+    no?: Function | undefined | null;
+    save?: Function | undefined | null;
+    default?: Function | undefined | null;
+  };
   show?: Boolean;
 };
 
@@ -27,54 +42,94 @@ export default function Dialog({
     }
   }, [show]);
 
+  const btn_ok = () => (
+    <button
+      type="button"
+      className={`${styles.button} ${styles.btn_ok}`}
+      onClick={(e) => {
+        setVisible(false);
+        if (footer && footer === "ok" && callbacks && callbacks.ok) {
+          callbacks.ok();
+        }
+      }}
+    >
+      Ok
+    </button>
+  );
+
+  const btn_cancel = () => (
+    <button
+      type="button"
+      className={`${styles.button} ${styles.btn_cancel}`}
+      onClick={(e) => {
+        setVisible(false);
+        if (footer && footer === "cancel" && callbacks && callbacks.cancel) {
+          callbacks.cancel();
+        }
+      }}
+    >
+      Cancel
+    </button>
+  );
+
+  const btn_saveCancel = () => (
+    <div className="flex gap-5">
+      <button
+        type="button"
+        className={`${styles.button} ${styles.btn_cancel}`}
+        onClick={(e) => {
+          if (callbacks && callbacks.cancel) {
+            callbacks.cancel();
+          }
+        }}
+      >
+        Cancel
+      </button>
+      <button
+        type="button"
+        className={`${styles.button} ${styles.btn_save}`}
+        onClick={(e) => {
+          if (callbacks && callbacks.save) {
+            callbacks.save();
+          }
+        }}
+      >
+        Save
+      </button>
+    </div>
+  );
+
+  const btn_unknown = () => (
+    <button
+      type="button"
+      className={`${styles.button} ${styles.btn_default}`}
+      onClick={(e) => {
+        setVisible(false);
+        if (callbacks && callbacks.default) {
+          callbacks.default();
+        }
+      }}
+    >
+      Default Action
+    </button>
+  );
+
+  const btn_save = () => (
+    <button type="button" className={`${styles.button} ${styles.btn_save}`}>
+      Save
+    </button>
+  );
+
   const renderFooter = () => {
     switch (footer) {
       case "ok":
-        return (
-          <div>
-            <button
-              type="button"
-              className={`${styles.button} ${styles.btn_ok}`}
-              onClick={(e) => {
-                setVisible(false);
-                if (callbacks && callbacks.length > 0) {
-                  callbacks[0]();
-                }
-              }}
-            >
-              Ok
-            </button>
-          </div>
-        );
+        return <div>{btn_ok()}</div>;
       case "cancel":
-        return (
-          <div>
-            <button
-              type="button"
-              className={`${styles.button} ${styles.btn_cancel}`}
-              onClick={() => setVisible(false)}
-            >
-              Cancel
-            </button>
-          </div>
-        );
+        return <div>{btn_cancel()}</div>;
+      case "save-cancel":
+        return <div>{btn_saveCancel()}</div>;
       default:
-        return (
-          <div>
-            <button
-              type="button"
-              className={`${styles.button} ${styles.btn_default}`}
-              onClick={(e) => {
-                setVisible(false);
-                if (callbacks && callbacks.length > 0) {
-                  callbacks[0]();
-                }
-              }}
-            >
-              Uh oh!
-            </button>
-          </div>
-        );
+        return <div>{btn_unknown()}</div>;
     }
   };
 

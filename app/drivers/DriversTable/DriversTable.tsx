@@ -5,6 +5,7 @@ import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { getAllDrivers } from "@/app/controllers/DriverController";
 import ErrorMessage from "@/app/components/ErrorMessage/ErrorMessage";
 import { TDriver } from "@/app/Types";
+import { TDialog } from "../../components/Dialog/Dialog";
 import CalendarReveal from "@/app/components/CalendarReveal/CalendarReveal";
 import Loading from "@/app/components/Loading/Loading";
 import Dialog from "../../components/Dialog/Dialog";
@@ -20,6 +21,19 @@ export default function DriversTable() {
     queryFn: getAllDrivers,
   });
 
+  const emptyForm = {
+    id: "",
+    firstName: "",
+    lastName: "",
+    defaultTruck: "",
+    endDumpPayRate: 0,
+    flatBedPayRate: 0,
+    ncPayRate: 0,
+    dateHired: undefined,
+    dateReleased: undefined,
+    isActive: false,
+  };
+
   const [form, setForm] = useState({
     id: "",
     firstName: "",
@@ -30,7 +44,7 @@ export default function DriversTable() {
     ncPayRate: 0,
     dateHired: undefined,
     dateReleased: undefined,
-    isActive: undefined,
+    isActive: false,
   });
 
   const [selectedDriver, setSelectedDriver] = useState<
@@ -215,6 +229,11 @@ export default function DriversTable() {
     setShowEditDialog(false);
   };
 
+  const onCancelEditCallback = () => {
+    setForm(emptyForm);
+    setShowEditDialog(false);
+  };
+
   useEffect(() => {
     if (selectedDriver) {
       setForm((prevState) => ({
@@ -243,7 +262,15 @@ export default function DriversTable() {
         title="Edit Driver"
         content={editDialogContent(selectedDriver)}
         show={showEditDialog}
-        callbacks={[onEditCallback]}
+        footer="save-cancel"
+        callbacks={{
+          cancel: () => {
+            // Clear form & hide dialog
+            setForm(emptyForm);
+            setShowEditDialog(false);
+          },
+          save: () => alert("save edit driver"),
+        }}
       />
       <table className={styles.table}>
         <thead>
