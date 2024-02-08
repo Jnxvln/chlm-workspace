@@ -5,15 +5,6 @@ import styles from "./Dialog.module.scss";
 export type TDialog = {
   title?: String;
   content?: String | ReactElement<any, any> | JSX.Element | undefined | null;
-  footer?:
-    | "ok"
-    | "cancel"
-    | "yes-no"
-    | "yes-no-ok"
-    | "yes-no-cancel"
-    | "save"
-    | "save-cancel"
-    | "default";
   callbacks: {
     ok?: Function | undefined | null;
     cancel?: Function | undefined | null;
@@ -23,13 +14,14 @@ export type TDialog = {
     default?: Function | undefined | null;
   };
   show?: Boolean;
+  loading: Boolean;
 };
 
 export default function Dialog({
   title,
   content,
-  footer,
   show,
+  loading,
   callbacks,
 }: TDialog) {
   const [visible, setVisible] = useState(false);
@@ -46,14 +38,15 @@ export default function Dialog({
     <button
       type="button"
       className={`${styles.button} ${styles.btn_ok}`}
+      disabled={loading}
       onClick={(e) => {
         setVisible(false);
-        if (footer && footer === "ok" && callbacks && callbacks.ok) {
+        if (callbacks && callbacks.ok) {
           callbacks.ok();
         }
       }}
     >
-      Ok
+      {loading ? "⏳" : "Ok"}
     </button>
   );
 
@@ -63,7 +56,7 @@ export default function Dialog({
       className={`${styles.button} ${styles.btn_cancel}`}
       onClick={(e) => {
         setVisible(false);
-        if (footer && footer === "cancel" && callbacks && callbacks.cancel) {
+        if (callbacks && callbacks.cancel) {
           callbacks.cancel();
         }
       }}
@@ -72,64 +65,64 @@ export default function Dialog({
     </button>
   );
 
-  const btn_saveCancel = () => (
-    <div className="flex gap-5">
-      <button
-        type="button"
-        className={`${styles.button} ${styles.btn_cancel}`}
-        onClick={(e) => {
-          if (callbacks && callbacks.cancel) {
-            callbacks.cancel();
-          }
-        }}
-      >
-        Cancel
-      </button>
-      <button
-        type="button"
-        className={`${styles.button} ${styles.btn_save}`}
-        onClick={(e) => {
-          if (callbacks && callbacks.save) {
-            callbacks.save();
-          }
-        }}
-      >
-        Save
-      </button>
-    </div>
-  );
-
-  const btn_unknown = () => (
+  const btn_yes = () => (
     <button
       type="button"
-      className={`${styles.button} ${styles.btn_default}`}
+      className={`${styles.button} ${styles.btn_yes}`}
+      disabled={loading}
       onClick={(e) => {
-        setVisible(false);
-        if (callbacks && callbacks.default) {
-          callbacks.default();
+        if (callbacks && callbacks.yes) {
+          callbacks.yes();
         }
       }}
     >
-      Default Action
+      {loading ? "⏳" : "Yes"}
+    </button>
+  );
+
+  const btn_no = () => (
+    <button
+      type="button"
+      className={`${styles.button} ${styles.btn_no}`}
+      disabled={loading}
+      onClick={(e) => {
+        if (callbacks && callbacks.no) {
+          callbacks.no();
+        }
+      }}
+    >
+      {loading ? "⏳" : "No"}
     </button>
   );
 
   const btn_save = () => (
-    <button type="button" className={`${styles.button} ${styles.btn_save}`}>
-      Save
+    <button
+      type="button"
+      className={`${styles.button} ${styles.btn_save}`}
+      disabled={loading}
+      onClick={(e) => {
+        if (callbacks && callbacks.save) {
+          callbacks.save();
+        }
+      }}
+    >
+      {loading ? "⏳" : "Save"}
     </button>
   );
 
   const renderFooter = () => {
-    switch (footer) {
-      case "ok":
-        return <div>{btn_ok()}</div>;
-      case "cancel":
-        return <div>{btn_cancel()}</div>;
-      case "save-cancel":
-        return <div>{btn_saveCancel()}</div>;
-      default:
-        return <div>{btn_unknown()}</div>;
+    if (callbacks) {
+      return (
+        <div className="flex gap-4">
+          {callbacks?.cancel ? btn_cancel() : null}
+          {callbacks?.no ? btn_no() : null}
+          {callbacks?.ok ? btn_ok() : null}
+          {callbacks?.yes ? btn_yes() : null}
+          {callbacks?.save ? btn_save() : null}
+        </div>
+      );
+    } else {
+      return <></>;
     }
   };
 

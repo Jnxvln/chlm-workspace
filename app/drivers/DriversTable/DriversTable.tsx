@@ -1,17 +1,24 @@
 "use client";
-import { useState, useEffect } from "react";
-import dayjs, { Dayjs } from "dayjs";
-import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { getAllDrivers } from "@/app/controllers/DriverController";
+import { useState, useEffect, ChangeEvent } from "react";
+import dayjs from "dayjs";
+import { useQuery, useQueryClient, useMutation } from "@tanstack/react-query";
+import {
+  getAllDrivers,
+  createDriver,
+  updateDriverById,
+  deleteDriverById,
+} from "@/app/controllers/DriverController";
+import toast from "react-hot-toast";
 import ErrorMessage from "@/app/components/ErrorMessage/ErrorMessage";
 import { TDriver } from "@/app/Types";
-import { TDialog } from "../../components/Dialog/Dialog";
 import CalendarReveal from "@/app/components/CalendarReveal/CalendarReveal";
 import Loading from "@/app/components/Loading/Loading";
 import Dialog from "../../components/Dialog/Dialog";
 import styles from "./DriversTable.module.scss";
 
 export default function DriversTable() {
+  const queryClient = useQueryClient();
+
   const {
     data: drivers,
     isLoading,
@@ -23,6 +30,18 @@ export default function DriversTable() {
 
   const emptyForm = {
     id: "",
+    firstName: "",
+    lastName: "",
+    defaultTruck: "",
+    endDumpPayRate: 0,
+    flatBedPayRate: 0,
+    ncPayRate: 0,
+    dateHired: undefined,
+    dateReleased: undefined,
+    isActive: false,
+  };
+
+  const emptyNewDriverForm = {
     firstName: "",
     lastName: "",
     defaultTruck: "",
@@ -47,12 +66,117 @@ export default function DriversTable() {
     isActive: false,
   });
 
+  const [newDriverForm, setNewDriverForm] = useState({
+    firstName: "",
+    lastName: "",
+    defaultTruck: "",
+    endDumpPayRate: 0,
+    flatBedPayRate: 0,
+    ncPayRate: 0,
+    dateHired: undefined,
+    dateReleased: undefined,
+    isActive: true,
+  });
+
+  const [loading, setLoading] = useState(false);
+
   const [selectedDriver, setSelectedDriver] = useState<
     TDriver | undefined | null
   >();
 
-  const [showEditDialog, setShowEditDialog] = useState(false);
+  const [showUnits, setShowUnits] = useState(true);
 
+  const [showEditDialog, setShowEditDialog] = useState(false);
+  const [showNewDriverDialog, setShowNewDriverDialog] = useState(false);
+  const [showConfirmDialog, setShowConfirmDialog] = useState(false);
+  const [inputConfirmDriverName, setInputConfirmDriverName] = useState("");
+
+  // #region Mutations
+  const newDriverMutation = useMutation({
+    mutationKey: ["drivers"],
+    mutationFn: () => createDriver(newDriverForm),
+    onSuccess: (data) => {
+      setLoading(false);
+      queryClient.invalidateQueries({ queryKey: ["drivers"] });
+      setNewDriverForm(emptyNewDriverForm);
+      setShowNewDriverDialog(false);
+      toast("Driver added", {
+        icon: "✔️",
+      });
+    },
+    onError: (error) => {
+      setLoading(false);
+      if (error && error.message) {
+        console.log(error.message);
+        console.error(error);
+        toast(error.message, {
+          icon: "❌",
+        });
+      } else {
+        console.log(
+          "[DriversTable newDriverMutation] onError: Failed to create new driver!"
+        );
+        console.error(error);
+        toast("Failed to create new driver", {
+          icon: "❌",
+        });
+      }
+    },
+  });
+
+  const updateDriverMutation = useMutation({
+    mutationKey: ["drivers"],
+    mutationFn: updateDriverById,
+    onSuccess: (data) => {
+      setLoading(false);
+      queryClient.invalidateQueries({ queryKey: ["drivers"] });
+      setForm(emptyForm);
+      setShowEditDialog(false);
+      toast(`${data.firstName} updated!`, {
+        icon: "✔️",
+      });
+    },
+    onError: (error) => {
+      setLoading(false);
+      if (error?.message) {
+        console.log(error.message);
+      }
+      console.error(error);
+      toast("Failed to update driver", {
+        icon: "❌",
+      });
+    },
+  });
+
+  const deleteDriverMutation = useMutation({
+    mutationKey: ["drivers"],
+    mutationFn: (driverId) => deleteDriverById(driverId),
+    onSuccess: (data) => {
+      setLoading(false);
+      queryClient.invalidateQueries({ queryKey: ["drivers"] });
+      setShowConfirmDialog(false);
+      setInputConfirmDriverName("");
+      toast("Driver deleted", {
+        icon: "✔️",
+      });
+    },
+    onError: (error) => {
+      setLoading(false);
+      setInputConfirmDriverName("");
+      toast("Error deleting driver", {
+        icon: "❌",
+      });
+      console.log("Error deleting driver");
+      if (error?.message) {
+        console.log(error.message);
+      }
+      console.error(error);
+    },
+  });
+
+  // #endregion Mutations
+
+  // #region Content (render)
   const PerLabel = ({ label }: { label: string }) => {
     return <span className={styles.perLabel}>/{label}</span>;
   };
@@ -62,7 +186,7 @@ export default function DriversTable() {
     return (
       <div>
         <header>
-          <h3 className="text-xl font-bold">
+          <h3 className="text-xl font-bold text-center">
             {driverArg.firstName} {driverArg.lastName}
           </h3>
         </header>
@@ -77,9 +201,11 @@ export default function DriversTable() {
                     <div>
                       <input
                         type="text"
+                        name="id"
                         tabIndex={-1}
                         value={form.id}
                         readOnly
+                        style={{ backgroundColor: "transparent" }}
                       />
                     </div>
                   </td>
@@ -92,8 +218,11 @@ export default function DriversTable() {
                     <div>
                       <input
                         type="text"
+                        name="firstName"
                         value={form.firstName}
+                        onChange={onChange}
                         placeholder="First Name"
+                        required
                       />
                     </div>
                   </td>
@@ -106,8 +235,11 @@ export default function DriversTable() {
                     <div>
                       <input
                         type="text"
+                        name="lastName"
                         value={form.lastName}
+                        onChange={onChange}
                         placeholder="Last Name"
+                        required
                       />
                     </div>
                   </td>
@@ -120,7 +252,9 @@ export default function DriversTable() {
                     <div>
                       <input
                         type="text"
+                        name="defaultTruck"
                         value={form.defaultTruck}
+                        onChange={onChange}
                         placeholder="Default Truck"
                       />
                     </div>
@@ -134,9 +268,11 @@ export default function DriversTable() {
                     <div>
                       <input
                         type="number"
+                        name="endDumpPayRate"
                         min={0}
                         step={0.01}
                         value={form.endDumpPayRate}
+                        onChange={onChange}
                       />
                     </div>
                   </td>
@@ -149,9 +285,11 @@ export default function DriversTable() {
                     <div>
                       <input
                         type="number"
+                        name="flatBedPayRate"
                         min={0}
                         step={0.01}
                         value={form.flatBedPayRate}
+                        onChange={onChange}
                       />
                     </div>
                   </td>
@@ -164,9 +302,11 @@ export default function DriversTable() {
                     <div>
                       <input
                         type="number"
+                        name="ncPayRate"
                         min={0}
                         step={0.01}
                         value={form.ncPayRate}
+                        onChange={onChange}
                       />
                     </div>
                   </td>
@@ -179,7 +319,9 @@ export default function DriversTable() {
                     <div>
                       <input
                         type="date"
+                        name="dateHired"
                         value={form.dateHired}
+                        onChange={onChange}
                         placeholder="Date Hired"
                         style={{ width: "100%" }}
                       />
@@ -194,7 +336,9 @@ export default function DriversTable() {
                     <div>
                       <input
                         type="date"
+                        name="dateReleased"
                         value={form.dateReleased}
+                        onChange={onChange}
                         placeholder="Date Released"
                         style={{ width: "100%" }}
                       />
@@ -207,7 +351,12 @@ export default function DriversTable() {
                   <td>Active: </td>
                   <td>
                     <div>
-                      <input type="checkbox" checked={form.isActive} />
+                      <input
+                        type="checkbox"
+                        name="isActive"
+                        checked={form.isActive}
+                        onChange={onChangeCheckbox}
+                      />
                     </div>
                   </td>
                 </tr>
@@ -219,20 +368,214 @@ export default function DriversTable() {
     );
   };
 
+  const confirmDialogContent = (driverArg: TDriver | undefined | null) => {
+    if (!driverArg) return null;
+    return (
+      <div>
+        <div>
+          You&apos;re about to{" "}
+          <strong className="text-red-600">
+            delete {driverArg.firstName} {driverArg.lastName}
+          </strong>
+          .
+          <div>
+            <strong>This cannot be undone!</strong>
+          </div>
+          <div className="mt-4">
+            Type the driver's first and last name to confirm
+          </div>
+        </div>
+        <div>
+          <input
+            type="text"
+            value={inputConfirmDriverName}
+            onChange={(e) => setInputConfirmDriverName(e.target.value)}
+          />
+        </div>
+      </div>
+    );
+  };
+
+  const newDriverDialogContent = () => {
+    return (
+      <div>
+        <form>
+          <table className={styles.editDriverTable}>
+            <tbody>
+              <tr>
+                <td>First Name: </td>
+                <td>
+                  <input
+                    type="text"
+                    name="firstName"
+                    value={newDriverForm.firstName}
+                    onChange={onChangeNewDriverForm}
+                    required
+                  />
+                </td>
+              </tr>
+              <tr>
+                <td>Last Name: </td>
+                <td>
+                  <input
+                    type="text"
+                    name="lastName"
+                    value={newDriverForm.lastName}
+                    onChange={onChangeNewDriverForm}
+                    required
+                  />
+                </td>
+              </tr>
+              <tr>
+                <td>Default Truck: </td>
+                <td>
+                  <input
+                    type="text"
+                    name="defaultTruck"
+                    value={newDriverForm.defaultTruck}
+                    onChange={onChangeNewDriverForm}
+                  />
+                </td>
+              </tr>
+              <tr>
+                <td>End Dump Rate: </td>
+                <td>
+                  <input
+                    type="number"
+                    min={0}
+                    step={0.01}
+                    name="endDumpPayRate"
+                    value={newDriverForm.endDumpPayRate}
+                    onChange={onChangeNewDriverForm}
+                  />
+                </td>
+              </tr>
+              <tr>
+                <td>Flat Bed Rate: </td>
+                <td>
+                  <input
+                    type="number"
+                    min={0}
+                    step={0.01}
+                    name="flatBedPayRate"
+                    value={newDriverForm.flatBedPayRate}
+                    onChange={onChangeNewDriverForm}
+                  />
+                </td>
+              </tr>
+              <tr>
+                <td>NC Pay Rate: </td>
+                <td>
+                  <input
+                    type="number"
+                    min={0}
+                    step={0.01}
+                    name="ncPayRate"
+                    value={newDriverForm.ncPayRate}
+                    onChange={onChangeNewDriverForm}
+                  />
+                </td>
+              </tr>
+              <tr>
+                <td>Date Hired: </td>
+                <td>
+                  <input
+                    type="date"
+                    name="dateHired"
+                    value={newDriverForm.dateHired}
+                    onChange={onChangeNewDriverForm}
+                  />
+                </td>
+              </tr>
+              <tr>
+                <td>Date Released: </td>
+                <td>
+                  <input
+                    type="date"
+                    name="dateReleased"
+                    value={newDriverForm.dateReleased}
+                    onChange={onChangeNewDriverForm}
+                  />
+                </td>
+              </tr>
+              <tr>
+                <td>Is Active: </td>
+                <td>
+                  <input
+                    type="checkbox"
+                    name="isActive"
+                    checked={newDriverForm.isActive}
+                    onChange={onChangeNewDriverCheckbox}
+                  />
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </form>
+      </div>
+    );
+  };
+  // #endregion Content (render)
+
+  // #region Events
+  const createNewDriver = () => {
+    newDriverMutation.mutate(newDriverForm);
+  };
+
   const onEdit = (driverArg: TDriver) => {
-    console.log(driverArg);
     setSelectedDriver(driverArg);
     setShowEditDialog(true);
   };
 
-  const onEditCallback = () => {
-    setShowEditDialog(false);
+  const onChange = (e: ChangeEvent<HTMLInputElement>) => {
+    setForm((prevState) => ({
+      ...prevState,
+      [e.target.name]: e.target.value,
+    }));
   };
 
-  const onCancelEditCallback = () => {
-    setForm(emptyForm);
-    setShowEditDialog(false);
+  const onChangeNewDriverForm = (e: ChangeEvent<HTMLInputElement>) => {
+    setNewDriverForm((prevState) => ({
+      ...prevState,
+      [e.target.name]: e.target.value,
+    }));
   };
+
+  const onChangeCheckbox = (e: ChangeEvent<HTMLInputElement>) => {
+    setForm((prevState) => ({
+      ...prevState,
+      isActive: e.target.checked,
+    }));
+  };
+
+  const onChangeNewDriverCheckbox = (e: ChangeEvent<HTMLInputElement>) => {
+    setNewDriverForm((prevState) => ({
+      ...prevState,
+      isActive: e.target.checked,
+    }));
+  };
+
+  const onNewDriver = () => {
+    setSelectedDriver(null);
+    setShowNewDriverDialog(true);
+  };
+
+  const onSubmit = () => {
+    setLoading(true);
+    updateDriverMutation.mutate(form);
+  };
+
+  const onDelete = (driverArg: any) => {
+    if (!driverArg) return;
+
+    // Confirm delete
+    setShowConfirmDialog(true);
+
+    setSelectedDriver(driverArg);
+
+    // deleteDriverMutation.mutate(driverId);
+  };
+  // #endregion Events
 
   useEffect(() => {
     if (selectedDriver) {
@@ -262,16 +605,89 @@ export default function DriversTable() {
         title="Edit Driver"
         content={editDialogContent(selectedDriver)}
         show={showEditDialog}
-        footer="save-cancel"
+        loading={loading}
         callbacks={{
           cancel: () => {
             // Clear form & hide dialog
             setForm(emptyForm);
             setShowEditDialog(false);
           },
-          save: () => alert("save edit driver"),
+          save: () => onSubmit(),
         }}
       />
+
+      <Dialog
+        title="Confirm"
+        content={confirmDialogContent(selectedDriver)}
+        show={showConfirmDialog}
+        loading={loading}
+        callbacks={{
+          yes: () => {
+            if (!selectedDriver)
+              return new Error("No driver selected to delete");
+
+            if (!inputConfirmDriverName || inputConfirmDriverName.length === 0)
+              return alert(
+                "You must enter the driver's name to confirm deletion"
+              );
+
+            if (
+              inputConfirmDriverName.toLowerCase() !==
+              `${selectedDriver.firstName} ${selectedDriver.lastName}`.toLowerCase()
+            ) {
+              return alert(
+                "The names do not match, try again (case doesn't matter)"
+              );
+            }
+
+            deleteDriverMutation.mutate(selectedDriver.id);
+          },
+          no: () => {
+            setInputConfirmDriverName("");
+            setShowConfirmDialog(false);
+          },
+        }}
+      />
+
+      <Dialog
+        title="New Driver"
+        content={newDriverDialogContent()}
+        show={showNewDriverDialog}
+        loading={loading}
+        callbacks={{
+          save: () => createNewDriver(),
+          cancel: () => {
+            // Clear the form and hide the dialog
+            setNewDriverForm(emptyNewDriverForm);
+            setShowNewDriverDialog(false);
+          },
+        }}
+      />
+
+      <div className="mb-4 flex gap-6 items-center">
+        <div>
+          <button
+            type="button"
+            className={styles.newDriverButton}
+            onClick={onNewDriver}
+          >
+            New Driver
+          </button>
+        </div>
+        <div className="flex gap-2">
+          <input
+            type="checkbox"
+            id="showUnits"
+            checked={showUnits}
+            onChange={(e) => {
+              setShowUnits(!showUnits);
+              localStorage.setItem("drivers-showUnits", showUnits.toString());
+            }}
+          />
+          <label htmlFor="showUnits">Show Units</label>
+        </div>
+      </div>
+
       <table className={styles.table}>
         <thead>
           <tr>
@@ -301,20 +717,20 @@ export default function DriversTable() {
                 {driver.endDumpPayRate
                   ? `$${driver.endDumpPayRate.toFixed(2).toString()}`
                   : null}
-                <PerLabel label="t" />
+                {showUnits ? <PerLabel label="t" /> : null}
               </td>
               <td>
                 {driver.flatBedPayRate
                   ? `$${driver.flatBedPayRate.toFixed(2).toString()}`
                   : null}
-                <PerLabel label="t" />
+                {showUnits ? <PerLabel label="t" /> : null}
               </td>
               <td>
                 $
                 {driver.ncPayRate
                   ? driver.ncPayRate.toFixed(2).toString()
                   : null}
-                <PerLabel label="hr" />
+                {showUnits ? <PerLabel label="hr" /> : null}
               </td>
               <td>
                 {driver.dateHired
@@ -351,7 +767,12 @@ export default function DriversTable() {
                   >
                     E
                   </button>
-                  <button type="button" className={styles.deleteBtn}>
+                  <button
+                    type="button"
+                    className={styles.deleteBtn}
+                    // onClick={() => onDelete(driver.id)}
+                    onClick={(e) => onDelete(driver)}
+                  >
                     X
                   </button>
                 </div>

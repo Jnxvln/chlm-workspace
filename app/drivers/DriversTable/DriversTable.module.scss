@@ -5,6 +5,7 @@ $driverTable-editBtnBgColor: #274370;
 $driverTable-deleteBtnBgColor: #943232;
 $driverTable-btnHoverLightenAmt: 10%;
 $driverTable-perLabel-color: #acacac;
+$driversTable-newDriverBtn: #0a733f;
 
 .wrapper {
   width: 1100px;
@@ -78,5 +79,18 @@ $driverTable-perLabel-color: #acacac;
 
   input {
     padding: 0.2em;
+  }
+}
+
+.newDriverButton {
+  background-color: $driversTable-newDriverBtn;
+  padding: 0.25em 0.65em;
+  border-radius: 7px;
+  color: white;
+  transition: background-color 0.2s ease-in-out;
+
+  &:hover {
+    background-color: darken($driversTable-newDriverBtn, 5%);
+    transition: background-color 0.2s ease-in-out;
   }
 }

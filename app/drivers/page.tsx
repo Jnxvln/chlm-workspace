@@ -4,10 +4,8 @@ import Dialog from "../components/Dialog/Dialog";
 
 export default function Drivers() {
   return (
-    <div>
+    <div className="p-4">
       <Heading title="Drivers" />
-      <br />
-      <Dialog content="This is my first dialog" footer="ok" />
       <br />
       <DriversTable />
     </div>

@@ -12,3 +12,15 @@ export type TDriver = {
   createdAt: Date;
   updatedAt: Date;
 };
+
+export type TDriverForm = {
+  firstName: String;
+  lastName: String;
+  defaultTruck?: String;
+  endDumpPayRate: Number;
+  flatBedPayRate: Number;
+  ncPayRate: Number;
+  dateHired?: Date;
+  dateReleased?: Date;
+  isActive?: Boolean;
+};
