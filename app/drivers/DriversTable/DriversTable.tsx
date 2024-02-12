@@ -84,7 +84,7 @@ export default function DriversTable() {
     TDriver | undefined | null
   >();
 
-  const [showUnits, setShowUnits] = useState(true);
+  const [showUnits, setShowUnits] = useState(false);
 
   const [showEditDialog, setShowEditDialog] = useState(false);
   const [showNewDriverDialog, setShowNewDriverDialog] = useState(false);
@@ -575,6 +575,11 @@ export default function DriversTable() {
 
     // deleteDriverMutation.mutate(driverId);
   };
+
+  const onToggleUnits = (e: ChangeEvent<HTMLInputElement>) => {
+    setShowUnits(e.target.checked);
+    localStorage.setItem("drivers-showUnits", e.target.checked);
+  };
   // #endregion Events
 
   useEffect(() => {
@@ -594,6 +599,17 @@ export default function DriversTable() {
       }));
     }
   }, [selectedDriver]);
+
+  useEffect(() => {
+    if (localStorage && localStorage.getItem("drivers-showUnits")) {
+      const val = localStorage.getItem("drivers-showUnits");
+      if (val?.toString().toLowerCase() === "true") {
+        setShowUnits(true);
+      } else {
+        setShowUnits(false);
+      }
+    }
+  }, []);
 
   if (error) return <ErrorMessage name={error.name} message={error.message} />;
 
@@ -679,10 +695,7 @@ export default function DriversTable() {
             type="checkbox"
             id="showUnits"
             checked={showUnits}
-            onChange={(e) => {
-              setShowUnits(!showUnits);
-              localStorage.setItem("drivers-showUnits", showUnits.toString());
-            }}
+            onChange={onToggleUnits}
           />
           <label htmlFor="showUnits">Show Units</label>
         </div>
