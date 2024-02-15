@@ -1,0 +1,100 @@
+$vendorTable-cellPadding: 0.15em;
+$vendorTable-btnPadding: 0.3em 1em;
+$vendorTable-btnBorderRadius: 5px;
+$vendorTable-editBtnBgColor: #274370;
+$vendorTable-deleteBtnBgColor: #943232;
+$vendorTable-btnHoverLightenAmt: 10%;
+$vendorTable-perLabel-color: #acacac;
+$vendorTable-newVendorBtn: #0a733f;
+
+.wrapper {
+  width: 1100px;
+}
+
+.perLabel {
+  font-weight: bold;
+  color: $vendorTable-perLabel-color;
+}
+
+.table {
+  width: 100%;
+  transition: background-color 0.2s;
+
+  tr:hover {
+    background-color: lighten($vendorTable-editBtnBgColor, 57%);
+    transition: background-color 0.2s;
+  }
+
+  tr th {
+    border: 1px solid #000;
+    text-align: left;
+    padding: $vendorTable-cellPadding;
+  }
+
+  td {
+    border: 1px solid #000;
+    text-align: left;
+    padding: $vendorTable-cellPadding;
+  }
+
+  td:first-child {
+    text-align: center;
+  }
+
+  button {
+    padding: $vendorTable-btnPadding;
+    border-radius: $vendorTable-btnBorderRadius;
+    color: white;
+    transition: background-color 0.2s ease-in-out;
+  }
+
+  .editBtn {
+    background-color: $vendorTable-editBtnBgColor;
+
+    &:hover {
+      background-color: lighten(
+        $vendorTable-editBtnBgColor,
+        $vendorTable-btnHoverLightenAmt
+      );
+      transition: background-color 0.2s ease-in-out;
+    }
+  }
+
+  .deleteBtn {
+    background-color: $vendorTable-deleteBtnBgColor;
+
+    &:hover {
+      background-color: lighten(
+        $vendorTable-deleteBtnBgColor,
+        $vendorTable-btnHoverLightenAmt
+      );
+    }
+  }
+}
+
+.editVendorTable {
+  tbody tr td {
+    padding: 0.25em;
+  }
+
+  input {
+    padding: 0.2em;
+  }
+}
+
+.newVendorButton {
+  background-color: $vendorTable-newVendorBtn;
+  padding: 0.25em 0.65em;
+  border-radius: 7px;
+  color: white;
+  transition: background-color 0.2s ease-in-out;
+
+  &:hover {
+    background-color: darken($vendorTable-newVendorBtn, 5%);
+    transition: background-color 0.2s ease-in-out;
+  }
+}
+
+.emptySurcharge {
+  color: rgb(174, 174, 174);
+}

@@ -20,7 +20,7 @@ model Contact {
   directions   String?
   asContractor Boolean?
   createdAt    DateTime   @default(now())
-  updatedAt    DateTime
+  updatedAt    DateTime   @updatedAt
   Delivery     Delivery[]
 }
 
@@ -38,7 +38,7 @@ model Delivery {
   completed       Boolean?
   isPaid          Boolean?
   createdAt       DateTime @default(now())
-  updatedAt       DateTime
+  updatedAt       DateTime @updatedAt
   Contact         Contact  @relation(fields: [contactId], references: [id], onDelete: NoAction, onUpdate: NoAction)
 }
 
@@ -67,7 +67,7 @@ model FreightRoute {
   vendorLocationId Int
   isActive         Boolean?
   createdAt        DateTime       @default(now())
-  updatedAt        DateTime
+  updatedAt        DateTime       @updatedAt
   Vendor           Vendor         @relation(fields: [vendorId], references: [id], onDelete: NoAction, onUpdate: NoAction)
   VendorLocation   VendorLocation @relation(fields: [vendorLocationId], references: [id], onDelete: NoAction, onUpdate: NoAction)
   Haul             Haul[]
@@ -91,7 +91,7 @@ model Haul {
   payRate          Float?
   driverPay        Float?
   createdAt        DateTime       @default(now())
-  updatedAt        DateTime
+  updatedAt        DateTime       @updatedAt
   Driver           Driver         @relation(fields: [driverId], references: [id], onDelete: NoAction, onUpdate: NoAction)
   FreightRoute     FreightRoute   @relation(fields: [freightRouteId], references: [id], onDelete: NoAction, onUpdate: NoAction)
   VendorLocation   VendorLocation @relation(fields: [vendorLocationId], references: [id], onDelete: NoAction, onUpdate: NoAction)
@@ -105,18 +105,18 @@ model User {
   phone     String
   role      Role     @default(USER)
   createdAt DateTime @default(now())
-  updatedAt DateTime
+  updatedAt DateTime @updatedAt
 }
 
 model Vendor {
   id                  Int              @id @default(autoincrement())
   name                String
   shortName           String
-  chtFuelSurcharge    Float
-  vendorFuelSurcharge Float
+  chtFuelSurcharge    Float            @default(0.00)
+  vendorFuelSurcharge Float            @default(0.00)
   isActive            Boolean?
   createdAt           DateTime         @default(now())
-  updatedAt           DateTime
+  updatedAt           DateTime         @updatedAt
   FreightRoute        FreightRoute[]
   VendorLocation      VendorLocation[]
   VendorProduct       VendorProduct[]
@@ -128,7 +128,7 @@ model VendorLocation {
   vendorId      Int
   isActive      Boolean?
   createdAt     DateTime        @default(now())
-  updatedAt     DateTime
+  updatedAt     DateTime        @updatedAt
   FreightRoute  FreightRoute[]
   Haul          Haul[]
   Vendor        Vendor          @relation(fields: [vendorId], references: [id], onDelete: NoAction, onUpdate: NoAction)
@@ -144,7 +144,7 @@ model VendorProduct {
   notes            String?
   isActive         Boolean?
   createdAt        DateTime       @default(now())
-  updatedAt        DateTime
+  updatedAt        DateTime       @updatedAt
   Vendor           Vendor         @relation(fields: [vendorId], references: [id], onDelete: NoAction, onUpdate: NoAction)
   VendorLocation   VendorLocation @relation(fields: [vendorLocationId], references: [id], onDelete: NoAction, onUpdate: NoAction)
 }
@@ -154,7 +154,7 @@ model Workday {
   driverId  Int
   date      DateTime
   createdAt DateTime @default(now())
-  updatedAt DateTime
+  updatedAt DateTime @updatedAt
   Driver    Driver   @relation(fields: [driverId], references: [id], onDelete: NoAction, onUpdate: NoAction)
 }
 

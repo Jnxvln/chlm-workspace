@@ -1,3 +1,4 @@
+// #region Driver
 export type TDriver = {
   id: Number;
   firstName: String;
@@ -24,3 +25,25 @@ export type TDriverForm = {
   dateReleased?: Date;
   isActive?: Boolean;
 };
+// #endregion
+
+// #region Vendor
+export type TVendor = {
+  id: Number;
+  name: String;
+  shortName: String;
+  chtFuelSurcharge: Number;
+  vendorFuelSurcharge: Number;
+  isActive?: Boolean;
+  createdAt?: Date;
+  updatedAt?: Date;
+};
+
+export type TVendorForm = {
+  name: String;
+  shortName: String;
+  chtFuelSurcharge: Number;
+  vendorFuelSurcharge: Number;
+  isActive?: Boolean;
+};
+// #endregion
