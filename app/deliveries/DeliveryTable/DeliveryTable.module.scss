@@ -1,0 +1,97 @@
+$deliveryTable-cellPadding: 0.15em;
+$deliveryTable-btnPadding: 0.3em 1em;
+$deliveryTable-btnBorderRadius: 5px;
+$deliveryTable-editBtnBgColor: #274370;
+$deliveryTable-deleteBtnBgColor: #943232;
+$deliveryTable-btnHoverLightenAmt: 10%;
+$deliveryTable-perLabel-color: #acacac;
+$deliveryTable-newDeliveryBtn: #0a733f;
+
+.wrapper {
+  width: 1100px;
+}
+
+.perLabel {
+  font-weight: bold;
+  color: $deliveryTable-perLabel-color;
+}
+
+.table {
+  width: 100%;
+  transition: background-color 0.2s;
+  margin-top: 1.5em;
+
+  tr:hover {
+    background-color: lighten($deliveryTable-editBtnBgColor, 57%);
+    transition: background-color 0.2s;
+  }
+
+  tr th {
+    border: 1px solid #000;
+    text-align: left;
+    padding: $deliveryTable-cellPadding;
+  }
+
+  td {
+    border: 1px solid #000;
+    text-align: left;
+    padding: $deliveryTable-cellPadding;
+  }
+
+  td:first-child {
+    text-align: center;
+  }
+
+  button {
+    padding: $deliveryTable-btnPadding;
+    border-radius: $deliveryTable-btnBorderRadius;
+    color: white;
+    transition: background-color 0.2s ease-in-out;
+  }
+
+  .editBtn {
+    background-color: $deliveryTable-editBtnBgColor;
+
+    &:hover {
+      background-color: lighten(
+        $deliveryTable-editBtnBgColor,
+        $deliveryTable-btnHoverLightenAmt
+      );
+      transition: background-color 0.2s ease-in-out;
+    }
+  }
+
+  .deleteBtn {
+    background-color: $deliveryTable-deleteBtnBgColor;
+
+    &:hover {
+      background-color: lighten(
+        $deliveryTable-deleteBtnBgColor,
+        $deliveryTable-btnHoverLightenAmt
+      );
+    }
+  }
+}
+
+.editDeliveryTable {
+  tbody tr td {
+    padding: 0.25em;
+  }
+
+  input {
+    padding: 0.2em;
+  }
+}
+
+.newDeliveryButton {
+  background-color: $deliveryTable-newDeliveryBtn;
+  padding: 0.25em 0.65em;
+  border-radius: 7px;
+  color: white;
+  transition: background-color 0.2s ease-in-out;
+
+  &:hover {
+    background-color: darken($deliveryTable-newDeliveryBtn, 5%);
+    transition: background-color 0.2s ease-in-out;
+  }
+}
