@@ -38,6 +38,11 @@ export default function Navbar() {
       href: "/materials",
       label: "Materials",
     },
+    {
+      id: "contacts",
+      href: "/contacts",
+      label: "Contacts",
+    },
   ];
 
   return (

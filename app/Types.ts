@@ -25,6 +25,15 @@ export type TDriverForm = {
   dateReleased?: Date;
   isActive?: Boolean;
 };
+
+export type TContactForm = {
+  firstName: String;
+  lastName: String;
+  phone: String;
+  address?: String;
+  email?: String;
+  locations?: Array<any>; // update `any` to its own type
+};
 // #endregion
 
 // #region Vendor
