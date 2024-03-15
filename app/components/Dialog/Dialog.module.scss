@@ -20,7 +20,8 @@ $dialog-btn-yes-bgcolor: #19387f;
 }
 
 .wrapper {
-  width: 460px;
+  min-width: 460px;
+  max-width: 480px;
   margin: 0 auto;
   margin-top: 5%;
   background-color: $dialog-bgcolor;

@@ -58,6 +58,7 @@ export default function Contacts() {
     lastName: true,
     phone: true,
     email: true,
+    locations: true,
   });
   const [showNewLocationDialog, setShowNewLocationDialog] = useState(false);
 
@@ -98,6 +99,7 @@ export default function Contacts() {
       lastName: false,
       phone: false,
       email: false,
+      locations: false,
     };
 
     if (!form.firstName || form.firstName.length <= 0) {
@@ -116,6 +118,10 @@ export default function Contacts() {
       formErrors.email = true;
     }
 
+    if (!form.locations || form.locations.length <= 0) {
+      formErrors.locations = true;
+    }
+
     return formErrors;
   };
 
@@ -131,7 +137,7 @@ export default function Contacts() {
       _formErrors.firstName ||
       _formErrors.lastName ||
       _formErrors.phone ||
-      _formErrors.email
+      _formErrors.locations
     ) {
       toast("Missing required fields", {
         icon: "❌",
@@ -244,8 +250,8 @@ export default function Contacts() {
             {/* Phone */}
             <tr className={styles.row}>
               <td className={styles.data}>
-                Phone(s)
-                <Requirement />:{" "}
+                Phone(s):
+                <Requirement />{" "}
               </td>
               <td className={styles.data}>
                 <textarea
@@ -286,7 +292,10 @@ export default function Contacts() {
 
             {/* Locations */}
             <tr className={styles.row}>
-              <td className={styles.data}>Location(s): </td>
+              <td className={styles.data}>
+                Location(s):
+                <Requirement />{" "}
+              </td>
               <td className={styles.data}>
                 <select
                   className={styles.data}
@@ -325,6 +334,14 @@ export default function Contacts() {
                 >
                   x
                 </button>
+              </td>
+            </tr>
+            <tr style={{ padding: 0 }}>
+              <td style={{ padding: 0 }}></td>
+              <td style={{ padding: 0 }}>
+                <small style={{ padding: 0, fontSize: "10pt" }}>
+                  At least 1 location required
+                </small>
               </td>
             </tr>
           </tbody>
@@ -448,6 +465,13 @@ export default function Contacts() {
         loading={loading}
         callbacks={{
           save: () => {
+            // Check required fields
+            if (!newLocationForm.address || newLocationForm.address === "") {
+              return toast("The address field is required", {
+                icon: "❌",
+              });
+            }
+
             // Return if address already exists
             let checkLoc = form.locations.find(
               (tmp) =>
@@ -456,7 +480,9 @@ export default function Contacts() {
             );
 
             if (checkLoc)
-              return alert("You already have a location with this address");
+              return toast("You already have a location with this address", {
+                icon: "❌",
+              });
 
             // Assemble location data and add to `form.locations`
             const loc = {
