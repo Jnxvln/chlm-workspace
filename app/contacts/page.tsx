@@ -23,8 +23,9 @@ type TForm = {
 };
 
 export default function Contacts() {
-  const locationsRef = useRef<HTMLSelectElement>(null)
-  const [deleteLocationsDisabled, setDeleteLocationsDisabled] = useState<boolean>(true)
+  const locationsRef = useRef<HTMLSelectElement>(null);
+  const [deleteLocationsDisabled, setDeleteLocationsDisabled] =
+    useState<boolean>(true);
   const [showNewContactDialog, setShowNewContactDialog] = useState(true);
   const [loading, setLoading] = useState(false);
   const [emptyForm] = useState({
@@ -48,9 +49,9 @@ export default function Contacts() {
     email: "",
     locations: [],
   });
-  const [selectedLocation, setSelectedLocation] = useState<
-    string | null | undefined
-  >(null);
+  const [selectedLocation, setSelectedLocation] = useState<string | undefined>(
+    ""
+  );
   const [newLocationForm, setNewLocationForm] = useState(emptyLocationForm);
   const [formErrors, setFormErrors] = useState({
     firstName: true,
@@ -154,12 +155,15 @@ export default function Contacts() {
   };
 
   const checkDisabledDeleteLocation = () => {
+    // Determine locations <select> disabled status
     if (locationsRef && locationsRef.current) {
-      const length = (locationsRef && locationsRef.current && locationsRef.current.length) - 1;
-      length <= 0 ? setDeleteLocationsDisabled(true) : setDeleteLocationsDisabled(false)
-      console.log('Items remaining: ' + length?.toString())
+      const length =
+        locationsRef && locationsRef.current && locationsRef.current.length;
+      length <= 0
+        ? setDeleteLocationsDisabled(true)
+        : setDeleteLocationsDisabled(false);
     }
-  }
+  };
 
   const onDeleteLocation = (e) => {
     // Determine index of matching address in <select>
@@ -180,7 +184,7 @@ export default function Contacts() {
       locationsRef.current.selectedIndex = -1;
 
       // Determine delete button disabledness
-      checkDisabledDeleteLocation()
+      checkDisabledDeleteLocation();
     }
   };
 
@@ -395,6 +399,9 @@ export default function Contacts() {
     if (form.locations) {
       console.log("`form` locations changed: ");
       console.log(form);
+
+      // Determine locations <select> disabled status
+      checkDisabledDeleteLocation();
     }
   }, [form.locations]);
 
