@@ -1,6 +1,7 @@
 "use client";
 import styles from "./Contacts.module.scss";
 import toast from "react-hot-toast";
+import { useRef } from "react";
 import { useQuery, useQueryClient, useMutation } from "@tanstack/react-query";
 import { useState, useEffect, ChangeEvent } from "react";
 import Dialog from "../components/Dialog/Dialog";
@@ -11,6 +12,7 @@ type TLocation = {
   coordinates?: string | String;
   directions?: string | String;
 };
+
 type TForm = {
   firstName: string | String;
   lastName: string | String;
@@ -21,6 +23,8 @@ type TForm = {
 };
 
 export default function Contacts() {
+  const locationsRef = useRef<HTMLSelectElement>(null)
+  const [deleteLocationsDisabled, setDeleteLocationsDisabled] = useState<boolean>(true)
   const [showNewContactDialog, setShowNewContactDialog] = useState(true);
   const [loading, setLoading] = useState(false);
   const [emptyForm] = useState({
@@ -149,20 +153,35 @@ export default function Contacts() {
     }));
   };
 
+  const checkDisabledDeleteLocation = () => {
+    if (locationsRef && locationsRef.current) {
+      const length = (locationsRef && locationsRef.current && locationsRef.current.length) - 1;
+      length <= 0 ? setDeleteLocationsDisabled(true) : setDeleteLocationsDisabled(false)
+      console.log('Items remaining: ' + length?.toString())
+    }
+  }
+
   const onDeleteLocation = (e) => {
-    console.log(e);
+    // Determine index of matching address in <select>
     const idx = form.locations.findIndex(
       (pred) => pred.address.toLowerCase() === selectedLocation?.toLowerCase()
     );
-    console.log("idx: " + idx);
+
+    // Filter out the matching address ("delete"), and update `form.locations`
     let tempLocs = form.locations.filter((loc, _idx) => _idx != idx);
     setForm((prevState) => ({
       ...prevState,
       locations: tempLocs,
     }));
 
-    // Reset position
+    // Deselect all <select> options (otherwise error when deleting last element)
     setSelectedLocation(null);
+    if (locationsRef.current) {
+      locationsRef.current.selectedIndex = -1;
+
+      // Determine delete button disabledness
+      checkDisabledDeleteLocation()
+    }
   };
 
   const onChangeLocationSelected = (e) => {
@@ -268,6 +287,7 @@ export default function Contacts() {
                 <select
                   className={styles.data}
                   size={5}
+                  ref={locationsRef}
                   value={selectedLocation}
                   onChange={onChangeLocationSelected}
                 >
@@ -288,14 +308,15 @@ export default function Contacts() {
               <td>
                 <button
                   type="button"
-                  className="bg-gray-500 hover:bg-gray-700 text-white px-2 rounded-md ml-3"
+                  className="bg-green-700 hover:bg-gray-700 text-white px-2 rounded-md ml-3"
                   onClick={onNewLocation}
                 >
                   +
                 </button>
                 <button
                   type="button"
-                  className="bg-red-600 hover:bg-red-700 text-white px-2 rounded-md ml-3"
+                  disabled={deleteLocationsDisabled}
+                  className="bg-red-600 hover:bg-red-800 text-white px-2 rounded-md ml-3 disabled:bg-gray-500"
                   onClick={onDeleteLocation}
                 >
                   x
