@@ -3,7 +3,8 @@
 }
 
 .newContactForm input,
-.newContactForm textarea {
+.newContactForm textarea,
+.newContactForm select {
   width: 100%;
   border-radius: 3px;
   padding: 0.3em;
@@ -21,4 +22,18 @@
 .newContactForm input,
 .newContactForm textarea {
   font-size: 15px;
+}
+
+.locationDialogContent {
+  tbody tr td {
+    padding: 0.25em;
+  }
+
+  input,
+  select,
+  textarea {
+    padding: 0.2em;
+    border-radius: 4px;
+    width: 100%;
+  }
 }

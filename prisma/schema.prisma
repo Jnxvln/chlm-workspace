@@ -25,6 +25,7 @@ model Location {
   id           Int            @id @default(autoincrement())
   address      String
   coordinates  String?
+  directions   String?
   createdAt    DateTime       @default(now())
   updatedAt    DateTime       @updatedAt
   contactId    Int
@@ -36,9 +37,6 @@ model Delivery {
   deliveryDate    DateTime
   contactId       Int
   deliveryPhone   String?
-  deliveryAddress String
-  coordinates     String?
-  directions      String?
   productName     String?
   productQuantity String?
   notes           String?

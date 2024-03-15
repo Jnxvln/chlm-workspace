@@ -6,6 +6,20 @@ import { useState, useEffect, ChangeEvent } from "react";
 import Dialog from "../components/Dialog/Dialog";
 import { createContact } from "../controllers/ContactController";
 
+type TLocation = {
+  address: string | String;
+  coordinates?: string | String;
+  directions?: string | String;
+};
+type TForm = {
+  firstName: string | String;
+  lastName: string | String;
+  company?: string | String | undefined | null;
+  phone: string | String;
+  email?: string | String | undefined | null;
+  locations: Array<TLocation>;
+};
+
 export default function Contacts() {
   const [showNewContactDialog, setShowNewContactDialog] = useState(true);
   const [loading, setLoading] = useState(false);
@@ -17,13 +31,30 @@ export default function Contacts() {
     email: "",
     locations: [],
   });
-  const [form, setForm] = useState(emptyForm);
+  const [emptyLocationForm] = useState({
+    address: "1234 Someplace Dr\nTexarkana, TX 75501",
+    coordinates: "12.345, 56.789",
+    directions: "LT here\nRT there\nYou're there",
+  });
+  const [form, setForm] = useState<TForm>({
+    firstName: "",
+    lastName: "",
+    company: "",
+    phone: "",
+    email: "",
+    locations: [],
+  });
+  const [selectedLocation, setSelectedLocation] = useState<
+    string | null | undefined
+  >(null);
+  const [newLocationForm, setNewLocationForm] = useState(emptyLocationForm);
   const [formErrors, setFormErrors] = useState({
     firstName: true,
     lastName: true,
     phone: true,
     email: true,
   });
+  const [showNewLocationDialog, setShowNewLocationDialog] = useState(false);
 
   // #region MUTATIONS
   // TODO: Create mutations
@@ -106,6 +137,37 @@ export default function Contacts() {
       createContactMutation.mutate();
     }
   };
+
+  const onNewLocation = (e) => {
+    setShowNewLocationDialog(true);
+  };
+
+  const onChangeNewLocationForm = (e) => {
+    setNewLocationForm((prevState) => ({
+      ...prevState,
+      [e.target.name]: e.target.value,
+    }));
+  };
+
+  const onDeleteLocation = (e) => {
+    console.log(e);
+    const idx = form.locations.findIndex(
+      (pred) => pred.address.toLowerCase() === selectedLocation?.toLowerCase()
+    );
+    console.log("idx: " + idx);
+    let tempLocs = form.locations.filter((loc, _idx) => _idx != idx);
+    setForm((prevState) => ({
+      ...prevState,
+      locations: tempLocs,
+    }));
+
+    // Reset position
+    setSelectedLocation(null);
+  };
+
+  const onChangeLocationSelected = (e) => {
+    setSelectedLocation(e.target.value);
+  };
   // #endregion
 
   // #region RENDER CONTENT
@@ -156,6 +218,23 @@ export default function Contacts() {
               </td>
             </tr>
 
+            {/* Phone */}
+            <tr className={styles.row}>
+              <td className={styles.data}>
+                Phone(s)
+                <Requirement />:{" "}
+              </td>
+              <td className={styles.data}>
+                <textarea
+                  name="phone"
+                  value={form.phone}
+                  onChange={onChangeNewContactForm}
+                  rows={2}
+                  required
+                ></textarea>
+              </td>
+            </tr>
+
             {/* Company */}
             <tr className={styles.row}>
               <td className={styles.data}>Company:</td>
@@ -169,28 +248,9 @@ export default function Contacts() {
               </td>
             </tr>
 
-            {/* Phone */}
-            <tr className={styles.row}>
-              <td className={styles.data}>
-                Phone(s)
-                <Requirement />:{" "}
-              </td>
-              <td className={styles.data}>
-                <textarea
-                  name="phone"
-                  value={form.phone}
-                  onChange={onChangeNewContactForm}
-                  rows={2}
-                ></textarea>
-              </td>
-            </tr>
-
             {/* Email */}
             <tr className={styles.row}>
-              <td className={styles.data}>
-                Email(s):
-                <Requirement />{" "}
-              </td>
+              <td className={styles.data}>Email(s):</td>
               <td className={styles.data}>
                 <textarea
                   name="email"
@@ -200,9 +260,101 @@ export default function Contacts() {
                 ></textarea>
               </td>
             </tr>
+
+            {/* Locations */}
+            <tr className={styles.row}>
+              <td className={styles.data}>Location(s): </td>
+              <td className={styles.data}>
+                <select
+                  className={styles.data}
+                  size={5}
+                  value={selectedLocation}
+                  onChange={onChangeLocationSelected}
+                >
+                  {form?.locations.map((loc, idx) => (
+                    <option
+                      key={idx}
+                      value={`${loc.address}`}
+                      style={{
+                        whiteSpace: "pre",
+                        fontSize: "13px",
+                      }}
+                    >
+                      {loc.address}
+                    </option>
+                  ))}
+                </select>
+              </td>
+              <td>
+                <button
+                  type="button"
+                  className="bg-gray-500 hover:bg-gray-700 text-white px-2 rounded-md ml-3"
+                  onClick={onNewLocation}
+                >
+                  +
+                </button>
+                <button
+                  type="button"
+                  className="bg-red-600 hover:bg-red-700 text-white px-2 rounded-md ml-3"
+                  onClick={onDeleteLocation}
+                >
+                  x
+                </button>
+              </td>
+            </tr>
           </tbody>
         </table>
       </form>
+    );
+  };
+
+  const newLocationDialogContent = () => {
+    return (
+      <div>
+        <form>
+          <table className={styles.locationDialogContent}>
+            <tbody>
+              <tr>
+                <td>
+                  Address
+                  <Requirement />:{" "}
+                </td>
+                <td>
+                  <textarea
+                    name="address"
+                    value={newLocationForm.address}
+                    onChange={onChangeNewLocationForm}
+                    required
+                    rows={2}
+                  ></textarea>
+                </td>
+              </tr>
+              <tr>
+                <td>Coordinates: </td>
+                <td>
+                  <input
+                    type="text"
+                    name="coordinates"
+                    value={newLocationForm.coordinates}
+                    onChange={onChangeNewLocationForm}
+                  />
+                </td>
+              </tr>
+              <tr>
+                <td>Directions: </td>
+                <td>
+                  <textarea
+                    name="directions"
+                    value={newLocationForm.directions}
+                    onChange={onChangeNewLocationForm}
+                    rows={5}
+                  ></textarea>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </form>
+      </div>
     );
   };
   // #endregion
@@ -211,6 +363,32 @@ export default function Contacts() {
   useEffect(() => {
     if (!formErrors) return;
   }, [formErrors]);
+
+  useEffect(() => {
+    if (selectedLocation) {
+      console.log("Selected location changed: " + selectedLocation);
+    }
+  }, [selectedLocation]);
+
+  useEffect(() => {
+    if (form.locations) {
+      console.log("`form` locations changed: ");
+      console.log(form);
+    }
+  }, [form.locations]);
+
+  useEffect(() => {
+    if (showNewLocationDialog) {
+      console.log("Show new location dialog...");
+    }
+  }, [showNewLocationDialog]);
+
+  useEffect(() => {
+    if (newLocationForm) {
+      console.log("NewLocationForm changed: ");
+      console.log(newLocationForm);
+    }
+  }, [newLocationForm]);
   // #endregion
 
   return (
@@ -231,6 +409,46 @@ export default function Contacts() {
             // TODO Empty form
             setForm(emptyForm);
             setShowNewContactDialog(false);
+          },
+        }}
+      />
+
+      <Dialog
+        title="New Location"
+        content={newLocationDialogContent()}
+        show={showNewLocationDialog}
+        loading={loading}
+        callbacks={{
+          save: () => {
+            // Return if address already exists
+            let checkLoc = form.locations.find(
+              (tmp) =>
+                tmp.address.toLowerCase() ===
+                newLocationForm.address.toLowerCase()
+            );
+
+            if (checkLoc)
+              return alert("You already have a location with this address");
+
+            // Assemble location data and add to `form.locations`
+            const loc = {
+              address: newLocationForm.address || "",
+              coordinates: newLocationForm.coordinates || "",
+              directions: newLocationForm.directions || "",
+            };
+            setForm((prevState) => ({
+              ...prevState,
+              locations: [...prevState.locations, loc],
+            }));
+
+            // Clear the form and hide the dialog
+            setNewLocationForm(emptyLocationForm);
+            setShowNewLocationDialog(false);
+          },
+          cancel: () => {
+            // Clear new location dialog form and close it
+            setNewLocationForm(emptyLocationForm);
+            setShowNewLocationDialog(false);
           },
         }}
       />
