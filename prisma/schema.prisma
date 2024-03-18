@@ -12,7 +12,6 @@ model Contact {
   firstName    String
   lastName     String
   phone        String
-  address      String?
   email        String?
   company      String?
   locations    Location[]

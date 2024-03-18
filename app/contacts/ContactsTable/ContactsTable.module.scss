@@ -1,0 +1,96 @@
+$contactsTable-cellPadding: 0.15em;
+$contactsTable-btnPadding: 0.3em 1em;
+$contactsTable-btnBorderRadius: 5px;
+$contactsTable-editBtnBgColor: #274370;
+$contactsTable-deleteBtnBgColor: #943232;
+$contactsTable-btnHoverLightenAmt: 10%;
+$contactsTable-perLabel-color: #acacac;
+$contactsTable-newContactBtn: #0a733f;
+
+.wrapper {
+  width: 1100px;
+}
+
+.perLabel {
+  font-weight: bold;
+  color: $contactsTable-perLabel-color;
+}
+
+.table {
+  width: 100%;
+  transition: background-color 0.2s;
+
+  tr:hover {
+    background-color: lighten($contactsTable-editBtnBgColor, 57%);
+    transition: background-color 0.2s;
+  }
+
+  tr th {
+    border: 1px solid #000;
+    text-align: left;
+    padding: $contactsTable-cellPadding;
+  }
+
+  td {
+    border: 1px solid #000;
+    text-align: left;
+    padding: $contactsTable-cellPadding;
+  }
+
+  td:first-child {
+    text-align: center;
+  }
+
+  button {
+    padding: $contactsTable-btnPadding;
+    border-radius: $contactsTable-btnBorderRadius;
+    color: white;
+    transition: background-color 0.2s ease-in-out;
+  }
+
+  .editBtn {
+    background-color: $contactsTable-editBtnBgColor;
+
+    &:hover {
+      background-color: lighten(
+        $contactsTable-editBtnBgColor,
+        $contactsTable-btnHoverLightenAmt
+      );
+      transition: background-color 0.2s ease-in-out;
+    }
+  }
+
+  .deleteBtn {
+    background-color: $contactsTable-deleteBtnBgColor;
+
+    &:hover {
+      background-color: lighten(
+        $contactsTable-deleteBtnBgColor,
+        $contactsTable-btnHoverLightenAmt
+      );
+    }
+  }
+}
+
+.editContactTable {
+  tbody tr td {
+    padding: 0.25em;
+  }
+
+  input {
+    padding: 0.2em;
+  }
+}
+
+.newContactButton {
+  background-color: $contactsTable-newContactBtn;
+  padding: 0.25em 0.65em;
+  border-radius: 7px;
+  color: white;
+  transition: background-color 0.2s ease-in-out;
+
+  &:hover {
+    background-color: darken($contactsTable-newContactBtn, 5%);
+    transition: background-color 0.2s ease-in-out;
+  }
+}

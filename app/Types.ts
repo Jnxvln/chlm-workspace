@@ -56,3 +56,16 @@ export type TVendorForm = {
   isActive?: Boolean;
 };
 // #endregion
+
+// #region Contact
+export type TContact = {
+  id: Number;
+  firstName: String;
+  lastName: String;
+  phone: String;
+  email?: String;
+  company?: String;
+  createdAt?: Date | String | null | undefined;
+  updatedAt?: Date | String | null | undefined;
+}
+// #endregion

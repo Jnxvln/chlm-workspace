@@ -72,6 +72,12 @@ export default function Contacts() {
       toast("Contact created successfully", {
         icon: "✔️",
       });
+      // Clear the forms and close all related dialogs
+      setForm(emptyForm);
+      setNewLocationForm(emptyLocationForm);
+      setSelectedLocation("");
+      setShowNewContactDialog(false);
+      setShowNewLocationDialog(false);
     },
     onError: (err) => {
       setLoading(false);
@@ -506,6 +512,10 @@ export default function Contacts() {
           },
         }}
       />
+
+      <section>
+        <h1 className="text-3xl">Big Text</h1>
+      </section>
     </div>
   );
 }
