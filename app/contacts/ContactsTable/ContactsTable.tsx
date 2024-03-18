@@ -1,7 +1,7 @@
 "use client"
 import { TContact } from "@/app/Types";
 import CalendarReveal from "@/app/components/CalendarReveal/CalendarReveal";
-import { useState, useEffect } from "react";
+import { useState, useEffect, ChangeEvent } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import dayjs from "dayjs";
 import { getAllContacts } from "@/app/controllers/ContactController";
@@ -19,6 +19,10 @@ export default function ContactsTable () {
 		queryKey: ['contacts'],
 		queryFn: getAllContacts
 	})
+
+	const [contactForm, setContactForm] = useState({
+		
+	})
 	// #endregion
 
 	// #region EVENTS
@@ -26,29 +30,17 @@ export default function ContactsTable () {
 		// setSelectedDriver(driverArg);
 		// setShowEditDialog(true);
 	};
-	
-	  const onChange = (e: ChangeEvent<HTMLInputElement>) => {
-		setForm((prevState) => ({
-		  ...prevState,
-		  [e.target.name]: e.target.value,
-		}));
-	  };
+
+	const onChange = (e: ChangeEvent<HTMLInputElement>) => {
+	setContactForm((prevState) => ({
+		...prevState,
+		[e.target.name]: e.target.value,
+	}));
+	};
 	// #endregion
 
 	return (
 		<div>
-			<div className="mb-4 flex gap-6 items-center">
-				<div>
-					<button
-						type="button"
-						className={styles.newContactButton}
-						onClick={onNewContact}
-					>
-						New Contact
-					</button>
-				</div>
-			</div>
-
 			<table className={styles.table}>
 				<thead>
 					<tr>
