@@ -6,6 +6,7 @@ import { useQuery, useQueryClient, useMutation } from "@tanstack/react-query";
 import { useState, useEffect, ChangeEvent } from "react";
 import Dialog from "../components/Dialog/Dialog";
 import { createContact } from "../controllers/ContactController";
+import ContactsTable from "./ContactsTable/ContactsTable";
 
 type TLocation = {
   address: string | String;
@@ -23,6 +24,7 @@ type TForm = {
 };
 
 export default function Contacts() {
+  // #region VARIABLES
   const locationsRef = useRef<HTMLSelectElement>(null);
   const [deleteLocationsDisabled, setDeleteLocationsDisabled] =
     useState<boolean>(true);
@@ -61,6 +63,7 @@ export default function Contacts() {
     locations: true,
   });
   const [showNewLocationDialog, setShowNewLocationDialog] = useState(false);
+  // #endregion
 
   // #region MUTATIONS
   // TODO: Create mutations
@@ -445,7 +448,9 @@ export default function Contacts() {
   return (
     <div className="p-4">
       <h1 className="text-3xl font-bold mb-3">Contacts</h1>
-      <div>A list of contacts including name, phone, and addresses.</div>
+      <div className="mb-4">
+        A list of contacts including name, phone, and addresses.
+      </div>
 
       <Dialog
         title="New Contact"
@@ -514,7 +519,7 @@ export default function Contacts() {
       />
 
       <section>
-        <h1 className="text-3xl">Big Text</h1>
+        <ContactsTable />
       </section>
     </div>
   );

@@ -58,16 +58,8 @@ export async function POST(req: Request) {
       { status: 400 }
     );
 
-  //   parseData(reqBody);
-
-  console.log("[API /contacts POST] reqBody: ");
-  console.log(reqBody);
-
   // TODO: Separate out the `locations` property, create the contact, THEN add locations?
-  const {locations, ...bodyWithoutLocs} = reqBody
-
-  console.log('bodyWithoutLocs: ')
-  console.log(bodyWithoutLocs)
+  const { locations, ...bodyWithoutLocs } = reqBody;
 
   const contact = await prisma.contact.create({
     data: bodyWithoutLocs,
@@ -77,7 +69,6 @@ export async function POST(req: Request) {
     return Response.json({
       error: "Server failed to create Contact",
     });
-
 
   // Add locations to the contact
   const contactWithLocs = await prisma.contact.update({
@@ -89,7 +80,7 @@ export async function POST(req: Request) {
         create: reqBody.locations,
       },
     },
-  })
+  });
 
   return Response.json(contact, { status: 200 });
 }
