@@ -94,3 +94,43 @@ $contactsTable-newContactBtn: #0a733f;
     transition: background-color 0.2s ease-in-out;
   }
 }
+
+.newContactForm {
+  width: 100%;
+}
+
+.newContactForm input,
+.newContactForm textarea,
+.newContactForm select {
+  width: 100%;
+  border-radius: 3px;
+  padding: 0.3em;
+}
+
+.newContactForm tr {
+  width: 100%;
+}
+
+.data {
+  padding-top: 0.25em !important;
+  padding-bottom: 0.25em !important;
+}
+
+.newContactForm input,
+.newContactForm textarea {
+  font-size: 15px;
+}
+
+.locationDialogContent {
+  tbody tr td {
+    padding: 0.25em;
+  }
+
+  input,
+  select,
+  textarea {
+    padding: 0.2em;
+    border-radius: 4px;
+    width: 100%;
+  }
+}

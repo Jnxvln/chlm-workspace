@@ -19,6 +19,7 @@ import styles from "./DriversTable.module.scss";
 export default function DriversTable() {
   const queryClient = useQueryClient();
 
+  // #region VARIABLES
   const {
     data: drivers,
     isLoading,
@@ -90,8 +91,9 @@ export default function DriversTable() {
   const [showNewDriverDialog, setShowNewDriverDialog] = useState(false);
   const [showConfirmDialog, setShowConfirmDialog] = useState(false);
   const [inputConfirmDriverName, setInputConfirmDriverName] = useState("");
+  // #endregion
 
-  // #region Mutations
+  // #region MUTATIONS
   const newDriverMutation = useMutation({
     mutationKey: ["drivers"],
     mutationFn: () => createDriver(newDriverForm),
@@ -176,7 +178,7 @@ export default function DriversTable() {
 
   // #endregion Mutations
 
-  // #region Content (render)
+  // #region CONTENT (RENDERING)
   const PerLabel = ({ label }: { label: string }) => {
     return <span className={styles.perLabel}>/{label}</span>;
   };
@@ -515,9 +517,9 @@ export default function DriversTable() {
       </div>
     );
   };
-  // #endregion Content (render)
+  // #endregion
 
-  // #region Events
+  // #region EVENTS
   const createNewDriver = () => {
     newDriverMutation.mutate(newDriverForm);
   };
@@ -582,6 +584,7 @@ export default function DriversTable() {
   };
   // #endregion Events
 
+  // #region USE-EFFECTS
   useEffect(() => {
     if (selectedDriver) {
       setForm((prevState) => ({
@@ -610,6 +613,7 @@ export default function DriversTable() {
       }
     }
   }, []);
+  // #endregion
 
   if (error) return <ErrorMessage name={error.name} message={error.message} />;
 
