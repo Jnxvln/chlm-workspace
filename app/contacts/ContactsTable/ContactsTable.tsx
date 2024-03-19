@@ -35,7 +35,7 @@ export default function ContactsTable() {
   // #endregion
 
   return (
-    <div>
+    <div className={styles.wrapper}>
       <table className={styles.table}>
         <thead>
           <tr>
