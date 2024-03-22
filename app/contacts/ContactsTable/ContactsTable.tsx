@@ -10,6 +10,7 @@ import CalendarReveal from "@/app/components/CalendarReveal/CalendarReveal";
 import {
   getAllContacts,
   createContact,
+  deleteContactById
 } from "@/app/controllers/ContactController";
 
 type TLocation = {
@@ -111,6 +112,29 @@ export default function ContactsTable() {
       });
     },
   });
+
+  const deleteContactMutation = useMutation({
+    mutationKey: ["contacts"],
+    onMutate: () => {
+      setLoading(true);
+    },
+    mutationFn: (contactArg: TContact) => deleteContactById(contactArg.id),
+    onSuccess: (data) => {
+      setLoading(false);
+      console.log("[ContactsTable onSuccess()]: Contact deleted, set loading to false")
+      queryClient.invalidateQueries({ queryKey: ["contacts"] });
+      toast("Contact deleted successfully", {
+        icon: "✔️",
+      });
+    },
+    onError: (err) => {
+      setLoading(false);
+      console.log(err);
+      toast("Failed to create contact", {
+        icon: "❌",
+      });
+    },
+  })
   // #endregion
 
   // #region EVENTS
@@ -118,6 +142,12 @@ export default function ContactsTable() {
     setSelectedContact(contactArg);
     setShowEditDialog(true);
   };
+
+  const onDeleteContact = (contactArg: TContact) => {
+    console.log("[onDeleteContact()] contactArg: ")
+    console.log(contactArg)
+    deleteContactMutation.mutate(contactArg);
+  }
 
   const onChangeNewContactForm = (
     e: ChangeEvent<HTMLInputElement> | ChangeEvent<HTMLTextAreaElement>
@@ -487,7 +517,6 @@ export default function ContactsTable() {
             onSubmitNewContact();
           },
           cancel: () => {
-            // TODO Empty form
             setForm(emptyForm);
             setShowNewContactDialog(false);
           },
@@ -593,7 +622,7 @@ export default function ContactsTable() {
                       type="button"
                       className={styles.deleteBtn}
                       // onClick={() => onDelete(contact.id)}
-                      onClick={(e) => onDelete(contact)}
+                      onClick={(e) => onDeleteContact(contact)}
                     >
                       X
                     </button>
