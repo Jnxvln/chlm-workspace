@@ -10,6 +10,7 @@ import CalendarReveal from "@/app/components/CalendarReveal/CalendarReveal";
 import {
   getAllContacts,
   createContact,
+  deleteContactById,
 } from "@/app/controllers/ContactController";
 
 type TLocation = {
@@ -49,7 +50,7 @@ export default function ContactsTable() {
   const locationsRef = useRef<HTMLSelectElement>(null);
   const [deleteLocationsDisabled, setDeleteLocationsDisabled] =
     useState<boolean>(true);
-  const [showNewContactDialog, setShowNewContactDialog] = useState(true);
+  const [showNewContactDialog, setShowNewContactDialog] = useState(false);
   const [loading, setLoading] = useState(false);
   const [emptyForm] = useState({
     firstName: "",
@@ -102,6 +103,7 @@ export default function ContactsTable() {
       setSelectedLocation("");
       setShowNewContactDialog(false);
       setShowNewLocationDialog(false);
+      queryClient.invalidateQueries({ queryKey: ["contacts"] });
     },
     onError: (err) => {
       setLoading(false);
@@ -111,12 +113,54 @@ export default function ContactsTable() {
       });
     },
   });
+
+  const deleteContactMutation = useMutation({
+    mutationKey: ["contacts"],
+    mutationFn: (contactArg: TContact) => deleteContactById(contactArg.id),
+    onMutate: () => {
+      setLoading(true);
+    },
+    onSuccess: (data) => {
+      setLoading(false);
+      toast("Contact deleted successfully", {
+        icon: "✔️",
+      });
+      queryClient.invalidateQueries({ queryKey: ["contacts"] });
+    },
+    onError: (err) => {
+      setLoading(false);
+      toast("Error deleting contact. Check logs", {
+        icon: "❌",
+      });
+    },
+  });
   // #endregion
 
   // #region EVENTS
-  const onEdit = (contactArg: TContact) => {
+  const onEditContact = (contactArg: TContact) => {
     setSelectedContact(contactArg);
     setShowEditDialog(true);
+  };
+
+  const onDeleteContact = (contactArg: TContact) => {
+    console.log("onDeleteContact: ");
+    console.log(contactArg);
+    const conf = confirm(
+      "Do you want to permanently delete" +
+        contactArg.firstName +
+        " " +
+        contactArg.lastName +
+        "?"
+    );
+
+    if (conf) {
+      deleteContactMutation.mutate(contactArg);
+    }
+  };
+
+  const onNewContact = () => {
+    setSelectedContact(null);
+    setShowNewContactDialog(true);
   };
 
   const onChangeNewContactForm = (
@@ -545,6 +589,18 @@ export default function ContactsTable() {
       />
 
       <section>
+        <div className="mb-4 flex gap-6 items-center">
+          <div>
+            <button
+              type="button"
+              className={styles.newContactButton}
+              onClick={onNewContact}
+            >
+              New Contact
+            </button>
+          </div>
+        </div>
+
         <table className={styles.table}>
           <thead>
             <tr>
@@ -585,7 +641,7 @@ export default function ContactsTable() {
                     <button
                       type="button"
                       className={styles.editBtn}
-                      onClick={(e) => onEdit(contact)}
+                      onClick={(e) => onEditContact(contact)}
                     >
                       E
                     </button>
@@ -593,7 +649,7 @@ export default function ContactsTable() {
                       type="button"
                       className={styles.deleteBtn}
                       // onClick={() => onDelete(contact.id)}
-                      onClick={(e) => onDelete(contact)}
+                      onClick={(e) => onDeleteContact(contact)}
                     >
                       X
                     </button>
