@@ -4,6 +4,7 @@ import toast from "react-hot-toast";
 // import dayjs from "dayjs";
 import Dialog from "@/app/components/Dialog/Dialog";
 import { TContact } from "@/app/Types";
+import Loading from "@/app/components/Loading/Loading";
 import { useState, useEffect, useRef, ChangeEvent } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import CalendarReveal from "@/app/components/CalendarReveal/CalendarReveal";
@@ -117,7 +118,7 @@ export default function ContactsTable() {
   const deleteContactMutation = useMutation({
     mutationKey: ["contacts"],
     mutationFn: (contactArg: TContact) => deleteContactById(contactArg.id),
-    onMutate: () => {
+    onMutate: (data) => {
       setLoading(true);
     },
     onSuccess: (data) => {

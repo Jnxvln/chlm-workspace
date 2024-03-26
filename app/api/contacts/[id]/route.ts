@@ -68,9 +68,8 @@ export async function PUT(
 }
 
 export async function DELETE({ params }: { params: { id: number } }) {
-  console.log(
-    "[DELETE /contacts/:id] Contact delete request received. Id: " + params.id
-  );
+  console.log("[DELETE /contacts/:id] Contact delete request received. Id: ");
+  console.log(params.id);
 
   const delContact = await prisma.contact.delete({
     where: {
