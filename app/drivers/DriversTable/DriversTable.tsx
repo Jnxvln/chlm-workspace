@@ -8,14 +8,29 @@ import {
   updateDriverById,
   deleteDriverById,
 } from "@/app/controllers/DriverController";
+import { TDriver } from "@/app/Types";
 import toast from "react-hot-toast";
 import Requirement from "@/app/components/Requirement/Requirement";
 import ErrorMessage from "@/app/components/ErrorMessage/ErrorMessage";
-import { TDriver } from "@/app/Types";
+import SuccessEmoji from "@/app/components/Emojicons/SuccessEmoji";
+import ErrorEmoji from "@/app/components/Emojicons/ErrorEmoji";
 import CalendarReveal from "@/app/components/CalendarReveal/CalendarReveal";
 import Loading from "@/app/components/Loading/Loading";
 import Dialog from "../../components/Dialog/Dialog";
 import styles from "./DriversTable.module.scss";
+
+type TDriverForm = {
+  id?: string | number | undefined | null;
+  firstName: string;
+  lastName: string;
+  defaultTruck?: string | undefined | null;
+  endDumpPayRate: number;
+  flatBedPayRate: number;
+  ncPayRate: number;
+  dateHired?: Date | string | undefined | null;
+  dateReleased?: Date | string | undefined | null;
+  isActive?: boolean | undefined | null;
+};
 
 export default function DriversTable() {
   const queryClient = useQueryClient();
@@ -30,7 +45,7 @@ export default function DriversTable() {
     queryFn: getAllDrivers,
   });
 
-  const emptyForm = {
+  const emptyForm: TDriverForm = {
     id: "",
     firstName: "",
     lastName: "",
@@ -43,7 +58,7 @@ export default function DriversTable() {
     isActive: false,
   };
 
-  const emptyNewDriverForm = {
+  const emptyNewDriverForm: TDriverForm = {
     firstName: "",
     lastName: "",
     defaultTruck: "",
@@ -55,7 +70,7 @@ export default function DriversTable() {
     isActive: false,
   };
 
-  const [form, setForm] = useState({
+  const [form, setForm] = useState<TDriverForm>({
     id: "",
     firstName: "",
     lastName: "",
@@ -68,7 +83,7 @@ export default function DriversTable() {
     isActive: false,
   });
 
-  const [newDriverForm, setNewDriverForm] = useState({
+  const [newDriverForm, setNewDriverForm] = useState<TDriverForm>({
     firstName: "",
     lastName: "",
     defaultTruck: "",
@@ -104,7 +119,7 @@ export default function DriversTable() {
       setNewDriverForm(emptyNewDriverForm);
       setShowNewDriverDialog(false);
       toast("Driver added", {
-        icon: "✔️",
+        icon: <SuccessEmoji />,
       });
     },
     onError: (error) => {
@@ -113,7 +128,7 @@ export default function DriversTable() {
         console.log(error.message);
         console.error(error);
         toast(error.message, {
-          icon: "❌",
+          icon: <ErrorEmoji />,
         });
       } else {
         console.log(
@@ -405,6 +420,7 @@ export default function DriversTable() {
         <form>
           <table className={styles.editDriverTable}>
             <tbody>
+              {/* Row 1: First Name */}
               <tr>
                 <td>
                   First Name: <Requirement />
@@ -419,6 +435,8 @@ export default function DriversTable() {
                   />
                 </td>
               </tr>
+
+              {/* Row 2: Last Name*/}
               <tr>
                 <td>
                   Last Name: <Requirement />
@@ -433,6 +451,8 @@ export default function DriversTable() {
                   />
                 </td>
               </tr>
+
+              {/* Row 3: Default Truck */}
               <tr>
                 <td>Default Truck: </td>
                 <td>
@@ -444,6 +464,8 @@ export default function DriversTable() {
                   />
                 </td>
               </tr>
+
+              {/* Row 4: End Dump Rate */}
               <tr>
                 <td>
                   End Dump Rate: <Requirement />
@@ -459,6 +481,8 @@ export default function DriversTable() {
                   />
                 </td>
               </tr>
+
+              {/* Row 5: Flat Bed Rate */}
               <tr>
                 <td>
                   Flat Bed Rate: <Requirement />
@@ -474,6 +498,8 @@ export default function DriversTable() {
                   />
                 </td>
               </tr>
+
+              {/* Row 6:  NC Pay Rate*/}
               <tr>
                 <td>
                   NC Pay Rate: <Requirement />
@@ -489,6 +515,8 @@ export default function DriversTable() {
                   />
                 </td>
               </tr>
+
+              {/* Row 7: Date Hired */}
               <tr>
                 <td>Date Hired: </td>
                 <td>
@@ -500,6 +528,8 @@ export default function DriversTable() {
                   />
                 </td>
               </tr>
+
+              {/* Row 8: Date Released */}
               <tr>
                 <td>Date Released: </td>
                 <td>
@@ -511,6 +541,8 @@ export default function DriversTable() {
                   />
                 </td>
               </tr>
+
+              {/* Row 9: Is Active */}
               <tr>
                 <td>Is Active: </td>
                 <td>
@@ -531,10 +563,37 @@ export default function DriversTable() {
   // #endregion
 
   // #region EVENTS
+
+  const validateNewDriverForm = () => {
+    // Verify form fields for new Driver
+    if (
+      !form.firstName ||
+      !form.lastName ||
+      !form.endDumpPayRate ||
+      !form.flatBedPayRate ||
+      !form.ncPayRate
+    ) {
+      toast("Missing required fields", {
+        icon: <ErrorEmoji />,
+      });
+      return false;
+    } else {
+      console.log(
+        "[DriversTable validateNewDriverForm] Form passed validation..."
+      );
+      return true;
+    }
+  };
+
   const createNewDriver = () => {
     // TODO: Validate form
-
-    newDriverMutation.mutate(newDriverForm);
+    if (validateNewDriverForm()) {
+      newDriverMutation.mutate(newDriverForm);
+    } else {
+      return console.log(
+        "[DriversTable createNewDriver] Failed to create driver, form did not pass validation"
+      );
+    }
   };
 
   const onEdit = (driverArg: TDriver) => {
@@ -698,6 +757,7 @@ export default function DriversTable() {
       />
 
       <div className="mb-4 flex gap-6 items-center">
+        {/* New Driver button */}
         <div>
           <button
             type="button"
@@ -707,6 +767,8 @@ export default function DriversTable() {
             New Driver
           </button>
         </div>
+
+        {/* Show Units Toggle */}
         <div className="flex gap-2">
           <input
             type="checkbox"
@@ -737,6 +799,7 @@ export default function DriversTable() {
           </tr>
         </thead>
         <tbody>
+          {/* Drivers table */}
           {drivers?.map((driver: TDriver) => (
             <tr key={driver.id.toString()}>
               <td>{driver.id.toString()}</td>
@@ -788,6 +851,7 @@ export default function DriversTable() {
                 ) : null}
               </td>
 
+              {/* Action Buttons */}
               <td>
                 <div className="flex gap-2">
                   <button

@@ -5,6 +5,8 @@ import toast from "react-hot-toast";
 import Dialog from "@/app/components/Dialog/Dialog";
 import { TContact } from "@/app/Types";
 import Loading from "@/app/components/Loading/Loading";
+import SuccessEmoji from "@/app/components/Emojicons/SuccessEmoji";
+import ErrorEmoji from "@/app/components/Emojicons/ErrorEmoji";
 import { useState, useEffect, useRef, ChangeEvent } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import CalendarReveal from "@/app/components/CalendarReveal/CalendarReveal";
@@ -97,7 +99,7 @@ export default function ContactsTable() {
     onSuccess: (data) => {
       setLoading(false);
       toast("Contact created successfully", {
-        icon: "✔️",
+        icon: <SuccessEmoji />,
       });
       // Clear the forms and close all related dialogs
       setForm(emptyForm);
@@ -130,14 +132,14 @@ export default function ContactsTable() {
         "[ContactsTable onSuccess()]: Contact deleted, set loading to false"
       );
       toast("Contact (and its locations) deleted successfully", {
-        icon: "✔️",
+        icon: <SuccessEmoji />,
       });
     },
     onError: (err) => {
       setLoading(false);
       console.log(err);
       toast("Failed to delete contact", {
-        icon: "❌",
+        icon: <ErrorEmoji />,
       });
     },
   });
@@ -222,7 +224,7 @@ export default function ContactsTable() {
       _formErrors.locations
     ) {
       toast("Missing required fields", {
-        icon: "❌",
+        icon: <ErrorEmoji />,
       });
       setLoading(false);
       return;
@@ -546,7 +548,7 @@ export default function ContactsTable() {
             // Check required fields
             if (!newLocationForm.address || newLocationForm.address === "") {
               return toast("The address field is required", {
-                icon: "❌",
+                icon: <ErrorEmoji />,
               });
             }
 
@@ -559,7 +561,7 @@ export default function ContactsTable() {
 
             if (checkLoc)
               return toast("You already have a location with this address", {
-                icon: "❌",
+                icon: <ErrorEmoji />,
               });
 
             // Assemble location data and add to `form.locations`
