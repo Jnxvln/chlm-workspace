@@ -9,6 +9,7 @@ import {
   deleteDriverById,
 } from "@/app/controllers/DriverController";
 import toast from "react-hot-toast";
+import Requirement from "@/app/components/Requirement/Requirement";
 import ErrorMessage from "@/app/components/ErrorMessage/ErrorMessage";
 import { TDriver } from "@/app/Types";
 import CalendarReveal from "@/app/components/CalendarReveal/CalendarReveal";
@@ -405,7 +406,9 @@ export default function DriversTable() {
           <table className={styles.editDriverTable}>
             <tbody>
               <tr>
-                <td>First Name: </td>
+                <td>
+                  First Name: <Requirement />
+                </td>
                 <td>
                   <input
                     type="text"
@@ -417,7 +420,9 @@ export default function DriversTable() {
                 </td>
               </tr>
               <tr>
-                <td>Last Name: </td>
+                <td>
+                  Last Name: <Requirement />
+                </td>
                 <td>
                   <input
                     type="text"
@@ -440,7 +445,9 @@ export default function DriversTable() {
                 </td>
               </tr>
               <tr>
-                <td>End Dump Rate: </td>
+                <td>
+                  End Dump Rate: <Requirement />
+                </td>
                 <td>
                   <input
                     type="number"
@@ -453,7 +460,9 @@ export default function DriversTable() {
                 </td>
               </tr>
               <tr>
-                <td>Flat Bed Rate: </td>
+                <td>
+                  Flat Bed Rate: <Requirement />
+                </td>
                 <td>
                   <input
                     type="number"
@@ -466,7 +475,9 @@ export default function DriversTable() {
                 </td>
               </tr>
               <tr>
-                <td>NC Pay Rate: </td>
+                <td>
+                  NC Pay Rate: <Requirement />
+                </td>
                 <td>
                   <input
                     type="number"
@@ -521,6 +532,8 @@ export default function DriversTable() {
 
   // #region EVENTS
   const createNewDriver = () => {
+    // TODO: Validate form
+
     newDriverMutation.mutate(newDriverForm);
   };
 

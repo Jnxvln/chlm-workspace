@@ -13,6 +13,7 @@ import {
   createContact,
   deleteContactById,
 } from "@/app/controllers/ContactController";
+import Requirement from "@/app/components/Requirement/Requirement";
 
 type TLocation = {
   address: string | String;
@@ -281,10 +282,6 @@ export default function ContactsTable() {
   // #endregion
 
   // #region RENDER (CONTENT)
-  const Requirement = () => {
-    return <span className="font-bold text-red-600 mx-1">*</span>;
-  };
-
   const newContactForm = () => {
     return (
       <form>
