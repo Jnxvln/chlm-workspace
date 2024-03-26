@@ -120,21 +120,22 @@ export default function ContactsTable() {
     onMutate: () => {
       setLoading(true);
     },
-    mutationFn: (contactArg: TContact) => deleteContactById(contactArg.id),
+    mutationFn: (contactArg: TContact) =>
+      deleteContactById(parseInt(`${contactArg.id}`)),
     onSuccess: (data) => {
       setLoading(false);
+      queryClient.invalidateQueries({ queryKey: ["contacts"] });
       console.log(
         "[ContactsTable onSuccess()]: Contact deleted, set loading to false"
       );
-      queryClient.invalidateQueries({ queryKey: ["contacts"] });
-      toast("Contact deleted successfully", {
+      toast("Contact (and its locations) deleted successfully", {
         icon: "✔️",
       });
     },
     onError: (err) => {
       setLoading(false);
       console.log(err);
-      toast("Failed to create contact", {
+      toast("Failed to delete contact", {
         icon: "❌",
       });
     },
@@ -151,11 +152,7 @@ export default function ContactsTable() {
     console.log("onDeleteContact: ");
     console.log(contactArg);
     const conf = confirm(
-      "Do you want to permanently delete" +
-        contactArg.firstName +
-        " " +
-        contactArg.lastName +
-        "?"
+      `Do you want to PERMANENTLY delete contact ${contactArg.firstName} ${contactArg.lastName} (ID: ${contactArg.id}) AND its delivery locations? This cannot be undone!`
     );
 
     if (conf) {
@@ -605,65 +602,67 @@ export default function ContactsTable() {
           </div>
         </div>
 
-        <table className={styles.table}>
-          <thead>
-            <tr>
-              <th>ID</th>
-              <th>First</th>
-              <th>Last</th>
-              <th>Phone</th>
-              <th>Email</th>
-              <th>Company</th>
-              <th>Updated</th>
-              <th>Created</th>
-              <th>Actions</th>
-            </tr>
-          </thead>
-          <tbody>
-            {contacts?.map((contact: TContact) => (
-              <tr key={contact.id.toString()}>
-                <td>{contact.id.toString()}</td>
-                <td>{contact.firstName ? contact.firstName : null}</td>
-                <td>{contact.lastName ? contact.lastName : null}</td>
-                <td>{contact.phone ? contact.phone : null}</td>
-                <td>{contact.email ? contact.email : null}</td>
-                <td>{contact.company ? contact.company : null}</td>
-                <td>
-                  {contact.updatedAt ? (
-                    <CalendarReveal date={contact.updatedAt} />
-                  ) : null}
-                </td>
-                <td>
-                  {contact.createdAt ? (
-                    <CalendarReveal date={contact.createdAt} />
-                  ) : null}
-                </td>
-
-                {/* Actions */}
-                <td>
-                  <div className="flex gap-2">
-                    <button
-                      type="button"
-                      className={styles.editBtn}
-                      onClick={(e) => onEditContact(contact)}
-                    >
-                      E
-                    </button>
-                    <button
-                      type="button"
-                      className={styles.deleteBtn}
-                      // onClick={() => onDelete(contact.id)}
-                      onClick={(e) => onDeleteContact(contact)}
-                      onClick={(e) => onDeleteContact(contact)}
-                    >
-                      X
-                    </button>
-                  </div>
-                </td>
+        {isLoading ? (
+          <Loading />
+        ) : (
+          <table className={styles.table}>
+            <thead>
+              <tr>
+                <th>ID</th>
+                <th>First</th>
+                <th>Last</th>
+                <th>Phone</th>
+                <th>Email</th>
+                <th>Company</th>
+                <th>Updated</th>
+                <th>Created</th>
+                <th>Actions</th>
               </tr>
-            ))}
-          </tbody>
-        </table>
+            </thead>
+            <tbody>
+              {contacts?.map((contact: TContact) => (
+                <tr key={contact.id.toString()}>
+                  <td>{contact.id.toString()}</td>
+                  <td>{contact.firstName ? contact.firstName : null}</td>
+                  <td>{contact.lastName ? contact.lastName : null}</td>
+                  <td>{contact.phone ? contact.phone : null}</td>
+                  <td>{contact.email ? contact.email : null}</td>
+                  <td>{contact.company ? contact.company : null}</td>
+                  <td>
+                    {contact.updatedAt ? (
+                      <CalendarReveal date={contact.updatedAt} />
+                    ) : null}
+                  </td>
+                  <td>
+                    {contact.createdAt ? (
+                      <CalendarReveal date={contact.createdAt} />
+                    ) : null}
+                  </td>
+
+                  {/* Actions */}
+                  <td>
+                    <div className="flex gap-2">
+                      <button
+                        type="button"
+                        className={styles.editBtn}
+                        onClick={(e) => onEditContact(contact)}
+                      >
+                        E
+                      </button>
+                      <button
+                        type="button"
+                        className={styles.deleteBtn}
+                        onClick={(e) => onDeleteContact(contact)}
+                      >
+                        X
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        )}
       </section>
     </div>
   );

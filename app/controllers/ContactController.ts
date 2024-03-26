@@ -1,4 +1,4 @@
-import { TContactForm } from "../Types";
+import { TContact, TContactForm } from "../Types";
 
 const API_CONTACTS = "http://localhost:3000/api/contacts";
 
@@ -69,7 +69,9 @@ export async function updateContactById(contactArg: TContactForm) {
   return data;
 }
 
-export async function deleteContactById(contactId: any) {
+export async function deleteContactById(contactId: number) {
+  console.log("[ContactController deleteContactById] Contact ID: " + contactId);
+
   if (!contactId)
     throw new Error("[ContactController] Cannot delete contact without ID");
 

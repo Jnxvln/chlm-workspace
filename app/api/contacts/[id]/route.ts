@@ -67,11 +67,22 @@ export async function PUT(
   return Response.json(updContact);
 }
 
-export async function DELETE({ params }: { params: { id: number } }) {
+export async function DELETE(
+  req: Request,
+  { params }: { params: { id: number } }
+) {
   console.log(
     "[DELETE /api/contacts/:id] Deleting contact with id:" + params.id
   );
 
+  // Delete related `location` foreign constraint
+  await prisma.location.deleteMany({
+    where: {
+      contactId: parseInt(`${params.id}`),
+    },
+  });
+
+  // Then delete the contact
   const delContact = await prisma.contact.delete({
     where: {
       id: parseInt(`${params.id}`),
