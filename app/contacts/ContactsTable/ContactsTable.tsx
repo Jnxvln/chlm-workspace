@@ -117,20 +117,24 @@ export default function ContactsTable() {
 
   const deleteContactMutation = useMutation({
     mutationKey: ["contacts"],
-    mutationFn: (contactArg: TContact) => deleteContactById(contactArg.id),
-    onMutate: (data) => {
+    onMutate: () => {
       setLoading(true);
     },
+    mutationFn: (contactArg: TContact) => deleteContactById(contactArg.id),
     onSuccess: (data) => {
       setLoading(false);
+      console.log(
+        "[ContactsTable onSuccess()]: Contact deleted, set loading to false"
+      );
+      queryClient.invalidateQueries({ queryKey: ["contacts"] });
       toast("Contact deleted successfully", {
         icon: "✔️",
       });
-      queryClient.invalidateQueries({ queryKey: ["contacts"] });
     },
     onError: (err) => {
       setLoading(false);
-      toast("Error deleting contact. Check logs", {
+      console.log(err);
+      toast("Failed to create contact", {
         icon: "❌",
       });
     },
@@ -532,7 +536,6 @@ export default function ContactsTable() {
             onSubmitNewContact();
           },
           cancel: () => {
-            // TODO Empty form
             setForm(emptyForm);
             setShowNewContactDialog(false);
           },
@@ -650,6 +653,7 @@ export default function ContactsTable() {
                       type="button"
                       className={styles.deleteBtn}
                       // onClick={() => onDelete(contact.id)}
+                      onClick={(e) => onDeleteContact(contact)}
                       onClick={(e) => onDeleteContact(contact)}
                     >
                       X
