@@ -565,34 +565,45 @@ export default function DriversTable() {
   // #region EVENTS
 
   const validateNewDriverForm = () => {
-    // Verify form fields for new Driver
-    if (
-      !form.firstName ||
-      !form.lastName ||
-      !form.endDumpPayRate ||
-      !form.flatBedPayRate ||
-      !form.ncPayRate
-    ) {
-      toast("Missing required fields", {
-        icon: <ErrorEmoji />,
-      });
-      return false;
-    } else {
-      console.log(
-        "[DriversTable validateNewDriverForm] Form passed validation..."
-      );
-      return true;
+    const formErrors = {
+      firstName: false,
+      lastName: false,
+      endDumpPayRate: false,
+      flatBedPayRate: false,
+      ncPayRate: false,
+    };
+
+    if (!form.firstName || form.firstName.length <= 0) {
+      formErrors.firstName = true;
     }
+
+    if (!form.lastName || form.lastName.length <= 0) {
+      formErrors.lastName = true;
+    }
+
+    if (!form.endDumpPayRate || form.endDumpPayRate < 0) {
+      formErrors.endDumpPayRate = true;
+    }
+
+    if (!form.flatBedPayRate || form.flatBedPayRate < 0) {
+      formErrors.flatBedPayRate = true;
+    }
+
+    if (!form.ncPayRate || form.ncPayRate < 0) {
+      formErrors.ncPayRate = true;
+    }
+
+    return formErrors;
   };
 
   const createNewDriver = () => {
     // TODO: Validate form
     if (validateNewDriverForm()) {
+      // Validate new contact form
+      const _formErrors = validateForm();
+      setFormErrors(_formErrors);
+
       newDriverMutation.mutate(newDriverForm);
-    } else {
-      return console.log(
-        "[DriversTable createNewDriver] Failed to create driver, form did not pass validation"
-      );
     }
   };
 
@@ -798,26 +809,40 @@ export default function DriversTable() {
             <th>Actions</th>
           </tr>
         </thead>
+
         <tbody>
           {/* Drivers table */}
           {drivers?.map((driver: TDriver) => (
             <tr key={driver.id.toString()}>
+              {/* Driver ID */}
               <td>{driver.id.toString()}</td>
+
+              {/* First Name */}
               <td>{driver.firstName ? driver.firstName : null}</td>
+
+              {/* Last Name */}
               <td>{driver.lastName ? driver.lastName : null}</td>
+
+              {/* Default Truck */}
               <td>{driver.defaultTruck ? driver.defaultTruck : null}</td>
+
+              {/* End Dump Pay Rate */}
               <td>
                 {driver.endDumpPayRate
                   ? `$${driver.endDumpPayRate.toFixed(2).toString()}`
                   : null}
                 {showUnits ? <PerLabel label="t" /> : null}
               </td>
+
+              {/* Flat Bed Pay Rate */}
               <td>
                 {driver.flatBedPayRate
                   ? `$${driver.flatBedPayRate.toFixed(2).toString()}`
                   : null}
                 {showUnits ? <PerLabel label="t" /> : null}
               </td>
+
+              {/* NC Pay Rate */}
               <td>
                 $
                 {driver.ncPayRate
@@ -825,26 +850,36 @@ export default function DriversTable() {
                   : null}
                 {showUnits ? <PerLabel label="hr" /> : null}
               </td>
+
+              {/* Date Hired */}
               <td>
                 {driver.dateHired
                   ? dayjs(driver.dateHired).format("MM/DD/YY")
                   : null}
               </td>
+
+              {/* Date Released */}
               <td>
                 {driver.dateReleased
                   ? dayjs(driver.dateReleased).format("MM/DD/YY")
                   : null}
               </td>
+
+              {/* Active */}
               <td>
                 <div className="text-center">
                   {driver.isActive ? "Yes" : "No"}
                 </div>
               </td>
+
+              {/* Updated At */}
               <td>
                 {driver.updatedAt ? (
                   <CalendarReveal date={driver.updatedAt} />
                 ) : null}
               </td>
+
+              {/* Created At */}
               <td>
                 {driver.createdAt ? (
                   <CalendarReveal date={driver.createdAt} />
