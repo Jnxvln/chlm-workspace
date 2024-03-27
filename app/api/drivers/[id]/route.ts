@@ -67,7 +67,7 @@ export async function PUT(
   return Response.json(updDriver);
 }
 
-export async function DELETE({ params }: { params: { id: number } }) {
+export async function DELETE(req: Request, { params }: { params: { id: number } }) {
   const delDriver = await prisma.driver.delete({
     where: {
       id: parseInt(`${params.id}`),

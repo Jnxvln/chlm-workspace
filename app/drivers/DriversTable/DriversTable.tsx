@@ -97,6 +97,14 @@ export default function DriversTable() {
 
   const [loading, setLoading] = useState(false);
 
+  const [formErrors, setFormErrors] = useState({
+    firstName: false,
+    lastName: false,
+    endDumpPayRate: false,
+    flatBedPayRate: false,
+    ncPayRate: false,
+  });
+
   const [selectedDriver, setSelectedDriver] = useState<
     TDriver | undefined | null
   >();
@@ -110,7 +118,7 @@ export default function DriversTable() {
   // #endregion
 
   // #region MUTATIONS
-  const newDriverMutation = useMutation({
+  const createDriverMutation = useMutation({
     mutationKey: ["drivers"],
     mutationFn: () => createDriver(newDriverForm),
     onSuccess: (data) => {
@@ -132,7 +140,7 @@ export default function DriversTable() {
         });
       } else {
         console.log(
-          "[DriversTable newDriverMutation] onError: Failed to create new driver!"
+          "[DriversTable createDriverMutation] onError: Failed to create new driver!"
         );
         console.error(error);
         toast("Failed to create new driver", {
@@ -565,6 +573,9 @@ export default function DriversTable() {
   // #region EVENTS
 
   const validateNewDriverForm = () => {
+
+    console.log('[DriversTable validateNewDriverForm] Validating form...')
+
     const formErrors = {
       firstName: false,
       lastName: false,
@@ -573,37 +584,54 @@ export default function DriversTable() {
       ncPayRate: false,
     };
 
-    if (!form.firstName || form.firstName.length <= 0) {
+    if (!newDriverForm.firstName || newDriverForm.firstName.length <= 0) {
       formErrors.firstName = true;
     }
 
-    if (!form.lastName || form.lastName.length <= 0) {
+    if (!newDriverForm.lastName || newDriverForm.lastName.length <= 0) {
       formErrors.lastName = true;
     }
 
-    if (!form.endDumpPayRate || form.endDumpPayRate < 0) {
+    if (newDriverForm.endDumpPayRate < 0) {
       formErrors.endDumpPayRate = true;
     }
 
-    if (!form.flatBedPayRate || form.flatBedPayRate < 0) {
+    if (newDriverForm.flatBedPayRate < 0) {
       formErrors.flatBedPayRate = true;
     }
 
-    if (!form.ncPayRate || form.ncPayRate < 0) {
+    if (newDriverForm.ncPayRate < 0) {
       formErrors.ncPayRate = true;
     }
+
+    console.log('Errors detected: ')
+    console.log(formErrors)
 
     return formErrors;
   };
 
   const createNewDriver = () => {
-    // TODO: Validate form
-    if (validateNewDriverForm()) {
-      // Validate new contact form
-      const _formErrors = validateForm();
-      setFormErrors(_formErrors);
+    // Set loading state to disable submit button
+    setLoading(true);
 
-      newDriverMutation.mutate(newDriverForm);
+    // Validate new contact form
+    const _formErrors = validateNewDriverForm();
+    setFormErrors(_formErrors);
+
+    if (
+      _formErrors.firstName ||
+      _formErrors.lastName ||
+      _formErrors.endDumpPayRate ||
+      _formErrors.flatBedPayRate || 
+      _formErrors.ncPayRate
+    ) {
+      toast("Missing required fields", {
+        icon: <ErrorEmoji />,
+      });
+      setLoading(false);
+      return;
+    } else {
+      createDriverMutation.mutate();
     }
   };
 

@@ -113,7 +113,7 @@ export default function ContactsTable() {
       setLoading(false);
       console.log(err);
       toast("Failed to create contact", {
-        icon: "❌",
+        icon: <ErrorEmoji/>,
       });
     },
   });
