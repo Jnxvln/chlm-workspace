@@ -24,6 +24,7 @@ type TLocation = {
 };
 
 type TForm = {
+  id?: string | String | number | Number;
   firstName: string | String;
   lastName: string | String;
   company?: string | String | undefined | null;
@@ -45,7 +46,7 @@ export default function ContactsTable() {
     queryFn: getAllContacts,
   });
 
-  const [showEditDialog, setShowEditDialog] = useState(false);
+  const [showEditContactDialog, setShowEditContactDialog] = useState(false);
 
   const [selectedContact, setSelectedContact] = useState<
     TContact | undefined | null
@@ -113,7 +114,7 @@ export default function ContactsTable() {
       setLoading(false);
       console.log(err);
       toast("Failed to create contact", {
-        icon: <ErrorEmoji/>,
+        icon: <ErrorEmoji />,
       });
     },
   });
@@ -148,7 +149,7 @@ export default function ContactsTable() {
   // #region EVENTS
   const onEditContact = (contactArg: TContact) => {
     setSelectedContact(contactArg);
-    setShowEditDialog(true);
+    setShowEditContactDialog(true);
   };
 
   const onDeleteContact = (contactArg: TContact) => {
@@ -430,6 +431,164 @@ export default function ContactsTable() {
     );
   };
 
+  const editContactDialogContent = (
+    contactArg: TContact | undefined | null
+  ) => {
+    if (!contactArg) return null;
+
+    return (
+      <div>
+        <header>
+          <h3 className="text-xl font-bold text-center">
+            {contactArg.firstName} {contactArg.lastName}
+          </h3>
+        </header>
+        <section>
+          <form>
+            <table className={styles.newContactForm}>
+              <tbody>
+                {/* First Name */}
+                <tr className={styles.row}>
+                  <td className={styles.data}>
+                    First Name:
+                    <Requirement />{" "}
+                  </td>
+                  <td className={styles.data}>
+                    <input
+                      type="text"
+                      name="firstName"
+                      value={form.firstName}
+                      onChange={onChangeNewContactForm}
+                      required
+                      autoFocus
+                    />
+                  </td>
+                </tr>
+
+                {/* Last Name */}
+                <tr className={styles.row}>
+                  <td className={styles.data}>
+                    Last Name:
+                    <Requirement />{" "}
+                  </td>
+                  <td className={styles.data}>
+                    <input
+                      type="text"
+                      name="lastName"
+                      value={form.lastName}
+                      onChange={onChangeNewContactForm}
+                      required
+                    />
+                  </td>
+                </tr>
+
+                {/* Phone */}
+                <tr className={styles.row}>
+                  <td className={styles.data}>
+                    Phone(s):
+                    <Requirement />{" "}
+                  </td>
+                  <td className={styles.data}>
+                    <textarea
+                      name="phone"
+                      value={form.phone}
+                      onChange={onChangeNewContactForm}
+                      rows={2}
+                      required
+                    ></textarea>
+                  </td>
+                </tr>
+
+                {/* Company */}
+                <tr className={styles.row}>
+                  <td className={styles.data}>Company:</td>
+                  <td className={styles.data}>
+                    <textarea
+                      name="company"
+                      value={form.company}
+                      onChange={onChangeNewContactForm}
+                      rows={2}
+                    ></textarea>
+                  </td>
+                </tr>
+
+                {/* Email */}
+                <tr className={styles.row}>
+                  <td className={styles.data}>Email(s):</td>
+                  <td className={styles.data}>
+                    <textarea
+                      name="email"
+                      value={form.email}
+                      onChange={onChangeNewContactForm}
+                      rows={2}
+                    ></textarea>
+                  </td>
+                </tr>
+
+                {/* Locations */}
+                <tr className={styles.row}>
+                  <td className={styles.data}>
+                    Location(s):
+                    <Requirement />{" "}
+                  </td>
+                  <td className={styles.data}>
+                    <select
+                      className={styles.data}
+                      size={5}
+                      ref={locationsRef}
+                      value={selectedLocation}
+                      onChange={onChangeLocationSelected}
+                    >
+                      {form?.locations.map((loc, idx) => (
+                        <option
+                          key={idx}
+                          value={`${loc.address}`}
+                          style={{
+                            whiteSpace: "pre",
+                            fontSize: "13px",
+                          }}
+                        >
+                          {loc.address}
+                        </option>
+                      ))}
+                    </select>
+                  </td>
+                  <td>
+                    <button
+                      type="button"
+                      className="bg-green-700 hover:bg-gray-700 text-white px-2 rounded-md ml-3"
+                      onClick={onNewLocation}
+                    >
+                      +
+                    </button>
+                    <button
+                      type="button"
+                      disabled={deleteLocationsDisabled}
+                      className="bg-red-600 hover:bg-red-800 text-white px-2 rounded-md ml-3 disabled:bg-gray-500"
+                      onClick={onDeleteLocation}
+                    >
+                      x
+                    </button>
+                  </td>
+                </tr>
+
+                {/* Location required text */}
+                <tr style={{ padding: 0 }}>
+                  <td style={{ padding: 0 }}></td>
+                  <td style={{ padding: 0 }}>
+                    <small style={{ padding: 0, fontSize: "10pt" }}>
+                      At least 1 location required
+                    </small>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </form>
+        </section>
+      </div>
+    );
+  };
+
   const newLocationDialogContent = () => {
     return (
       <div>
@@ -487,6 +646,22 @@ export default function ContactsTable() {
   }, [formErrors]);
 
   useEffect(() => {
+    if (selectedContact) {
+      // Get locations for this Contact
+      const locs = setForm((prevState) => ({
+        ...prevState,
+        id: selectedContact.id,
+        firstName: selectedContact.firstName,
+        lastName: selectedContact.lastName,
+        phone: selectedContact.phone,
+        company: selectedContact.company,
+        email: selectedContact.email,
+        // locations: selectedContact.locations,
+      }));
+    }
+  }, [selectedContact]);
+
+  useEffect(() => {
     if (selectedLocation) {
       console.log("Selected location changed: " + selectedLocation);
     }
@@ -516,12 +691,15 @@ export default function ContactsTable() {
   }, [newLocationForm]);
   // #endregion
 
+  if (isLoading) return <Loading />;
+
   return (
     <div className={styles.wrapper}>
       <div className="mb-4">
         A list of contacts including name, phone, and addresses.
       </div>
 
+      {/* New Contact Dialog */}
       <Dialog
         title="New Contact"
         content={newContactForm()}
@@ -538,6 +716,23 @@ export default function ContactsTable() {
         }}
       />
 
+      {/* Edit Contact Dialog */}
+      <Dialog
+        title="Edit Contact"
+        content={editContactDialogContent(selectedContact)}
+        show={showEditContactDialog}
+        loading={loading}
+        callbacks={{
+          cancel: () => {
+            // Clear form & hide dialog
+            setForm(emptyForm);
+            setShowEditContactDialog(false);
+          },
+          save: () => onSubmit(),
+        }}
+      />
+
+      {/* New Location Dialog */}
       <Dialog
         title="New Location"
         content={newLocationDialogContent()}
@@ -589,6 +784,7 @@ export default function ContactsTable() {
       />
 
       <section>
+        {/* New Contact button */}
         <div className="mb-4 flex gap-6 items-center">
           <div>
             <button
@@ -601,67 +797,64 @@ export default function ContactsTable() {
           </div>
         </div>
 
-        {isLoading ? (
-          <Loading />
-        ) : (
-          <table className={styles.table}>
-            <thead>
-              <tr>
-                <th>ID</th>
-                <th>First</th>
-                <th>Last</th>
-                <th>Phone</th>
-                <th>Email</th>
-                <th>Company</th>
-                <th>Updated</th>
-                <th>Created</th>
-                <th>Actions</th>
-              </tr>
-            </thead>
-            <tbody>
-              {contacts?.map((contact: TContact) => (
-                <tr key={contact.id.toString()}>
-                  <td>{contact.id.toString()}</td>
-                  <td>{contact.firstName ? contact.firstName : null}</td>
-                  <td>{contact.lastName ? contact.lastName : null}</td>
-                  <td>{contact.phone ? contact.phone : null}</td>
-                  <td>{contact.email ? contact.email : null}</td>
-                  <td>{contact.company ? contact.company : null}</td>
-                  <td>
-                    {contact.updatedAt ? (
-                      <CalendarReveal date={contact.updatedAt} />
-                    ) : null}
-                  </td>
-                  <td>
-                    {contact.createdAt ? (
-                      <CalendarReveal date={contact.createdAt} />
-                    ) : null}
-                  </td>
+        {/* New Contact table */}
+        <table className={styles.table}>
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th>First</th>
+              <th>Last</th>
+              <th>Phone</th>
+              <th>Email</th>
+              <th>Company</th>
+              <th>Updated</th>
+              <th>Created</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            {contacts?.map((contact: TContact) => (
+              <tr key={contact.id.toString()}>
+                <td>{contact.id.toString()}</td>
+                <td>{contact.firstName ? contact.firstName : null}</td>
+                <td>{contact.lastName ? contact.lastName : null}</td>
+                <td>{contact.phone ? contact.phone : null}</td>
+                <td>{contact.email ? contact.email : null}</td>
+                <td>{contact.company ? contact.company : null}</td>
+                <td>
+                  {contact.updatedAt ? (
+                    <CalendarReveal date={contact.updatedAt} />
+                  ) : null}
+                </td>
+                <td>
+                  {contact.createdAt ? (
+                    <CalendarReveal date={contact.createdAt} />
+                  ) : null}
+                </td>
 
-                  {/* Actions */}
-                  <td>
-                    <div className="flex gap-2">
-                      <button
-                        type="button"
-                        className={styles.editBtn}
-                        onClick={(e) => onEditContact(contact)}
-                      >
-                        E
-                      </button>
-                      <button
-                        type="button"
-                        className={styles.deleteBtn}
-                        onClick={(e) => onDeleteContact(contact)}
-                      >
-                        X
-                      </button>
-                    </div>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        )}
+                {/* Actions */}
+                <td>
+                  <div className="flex gap-2">
+                    <button
+                      type="button"
+                      className={styles.editBtn}
+                      onClick={(e) => onEditContact(contact)}
+                    >
+                      E
+                    </button>
+                    <button
+                      type="button"
+                      className={styles.deleteBtn}
+                      onClick={(e) => onDeleteContact(contact)}
+                    >
+                      X
+                    </button>
+                  </div>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
       </section>
     </div>
   );
