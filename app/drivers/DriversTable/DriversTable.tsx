@@ -144,7 +144,7 @@ export default function DriversTable() {
         );
         console.error(error);
         toast("Failed to create new driver", {
-          icon: "❌",
+          icon: <ErrorEmoji />,
         });
       }
     },
@@ -159,7 +159,7 @@ export default function DriversTable() {
       setForm(emptyForm);
       setShowEditDialog(false);
       toast(`${data.firstName} updated!`, {
-        icon: "✔️",
+        icon: <SuccessEmoji />,
       });
     },
     onError: (error) => {
@@ -169,7 +169,7 @@ export default function DriversTable() {
       }
       console.error(error);
       toast("Failed to update driver", {
-        icon: "❌",
+        icon: <ErrorEmoji />,
       });
     },
   });
@@ -183,14 +183,14 @@ export default function DriversTable() {
       setShowConfirmDialog(false);
       setInputConfirmDriverName("");
       toast("Driver deleted", {
-        icon: "✔️",
+        icon: <SuccessEmoji />,
       });
     },
     onError: (error) => {
       setLoading(false);
       setInputConfirmDriverName("");
       toast("Error deleting driver", {
-        icon: "❌",
+        icon: <ErrorEmoji />,
       });
       console.log("Error deleting driver");
       if (error?.message) {
@@ -573,8 +573,7 @@ export default function DriversTable() {
   // #region EVENTS
 
   const validateNewDriverForm = () => {
-
-    console.log('[DriversTable validateNewDriverForm] Validating form...')
+    console.log("[DriversTable validateNewDriverForm] Validating form...");
 
     const formErrors = {
       firstName: false,
@@ -604,8 +603,8 @@ export default function DriversTable() {
       formErrors.ncPayRate = true;
     }
 
-    console.log('Errors detected: ')
-    console.log(formErrors)
+    console.log("Errors detected: ");
+    console.log(formErrors);
 
     return formErrors;
   };
@@ -622,7 +621,7 @@ export default function DriversTable() {
       _formErrors.firstName ||
       _formErrors.lastName ||
       _formErrors.endDumpPayRate ||
-      _formErrors.flatBedPayRate || 
+      _formErrors.flatBedPayRate ||
       _formErrors.ncPayRate
     ) {
       toast("Missing required fields", {
@@ -635,7 +634,7 @@ export default function DriversTable() {
     }
   };
 
-  const onEdit = (driverArg: TDriver) => {
+  const onEditDriver = (driverArg: TDriver) => {
     setSelectedDriver(driverArg);
     setShowEditDialog(true);
   };
@@ -678,7 +677,7 @@ export default function DriversTable() {
     updateDriverMutation.mutate(form);
   };
 
-  const onDelete = (driverArg: any) => {
+  const onDeleteDriver = (driverArg: any) => {
     if (!driverArg) return;
 
     // Confirm delete
@@ -920,15 +919,14 @@ export default function DriversTable() {
                   <button
                     type="button"
                     className={styles.editBtn}
-                    onClick={(e) => onEdit(driver)}
+                    onClick={(e) => onEditDriver(driver)}
                   >
                     E
                   </button>
                   <button
                     type="button"
                     className={styles.deleteBtn}
-                    // onClick={() => onDelete(driver.id)}
-                    onClick={(e) => onDelete(driver)}
+                    onClick={(e) => onDeleteDriver(driver)}
                   >
                     X
                   </button>
